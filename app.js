@@ -34,17 +34,17 @@ const pdfData = {
             "Reglas de penalizaciones<br>• Las penalizaciones se establecen en contrato y pueden ser aplicables considerando los siguientes pasos:<br>&emsp;   o Visitas en cero<br>&emsp;   o Retrasos en servicio<br>&emsp;   o Incumplimientos operativos"
         ],
         kpis: [
-            { cat: "-", nombre: "Tiempo total de ciclo de pago", formula: "Fecha pago – Fecha extracción", interpretacion: "Menor tiempo = mayor eficiencia" },
-            { cat: "-", nombre: "Tiempo de espera de factura", formula: "Fecha factura – Fecha orden", interpretacion: "Alto = retraso del cliente" },
-            { cat: "-", nombre: "% de pagos en tiempo", formula: "(Pagos en tiempo / Total) × 100", interpretacion: "<80% indica problemas" },
-            { cat: "-", nombre: "% de pagos con errores", formula: "(Pagos con error / Total) × 100", interpretacion: "Ideal <5%" },
-            { cat: "-", nombre: "Monto total pagado", formula: "Σ pagos", interpretacion: "Control financiero" },
-            { cat: "-", nombre: "Costo por kilo", formula: "Total pagado / Total kilos", interpretacion: "Base para margen" },
-            { cat: "-", nombre: "% registros con inconsistencias", formula: "(Registros con error / Total) × 100", interpretacion: "Alto = problema operativo" },
-            { cat: "-", nombre: "% facturas a tiempo", formula: "(Facturas a tiempo / Total) × 100", interpretacion: "Bajo = retrasos externos" },
-            { cat: "-", nombre: "Monto acumulado (<$500)", formula: "Σ pagos menores a $500", interpretacion: "Alto = muchos pagos pequeños" },
-            { cat: "-", nombre: "% pagos sin factura", formula: "(Pagos sin factura / Total) × 100", interpretacion: "Debe ser 0%" },
-            { cat: "-", nombre: "% pagos conciliados", formula: "(Pagos conciliados / Total) × 100", interpretacion: "Cercano a 100%" }
+            { cat: "Tiempo / Eficiencia", nombre: "Tiempo total de ciclo de pago", formula: "Fecha pago – Fecha extracción", interpretacion: "Menor tiempo = mayor eficiencia" },
+            { cat: "Tiempo / Eficiencia", nombre: "Tiempo de espera de factura", formula: "Fecha factura – Fecha orden", interpretacion: "Alto = retraso del cliente" },
+            { cat: "Efectividad del proceso", nombre: "% de pagos en tiempo", formula: "(Pagos en tiempo / Total) × 100", interpretacion: "<80% indica problemas" },
+            { cat: "Calidad del proceso", nombre: "% de pagos con errores", formula: "(Pagos con error / Total) × 100", interpretacion: "Ideal <5%" },
+            { cat: "Financiero", nombre: "Monto total pagado", formula: "Σ pagos", interpretacion: "Control financiero" },
+            { cat: "Financiero", nombre: "Costo por kilo", formula: "Total pagado / Total kilos", interpretacion: "Base para margen" },
+            { cat: "Calidad de datos", nombre: "% registros con inconsistencias", formula: "(Registros con error / Total) × 100", interpretacion: "Alto = problema operativo" },
+            { cat: "Facturación / Cliente", nombre: "% facturas a tiempo", formula: "(Facturas a tiempo / Total) × 100", interpretacion: "Bajo = retrasos externos" },
+            { cat: "Financiero / Control", nombre: "Monto acumulado (<$500)", formula: "Σ pagos menores a $500", interpretacion: "Alto = muchos pagos pequeños" },
+            { cat: "Cumplimiento / Control", nombre: "% pagos sin factura", formula: "(Pagos sin factura / Total) × 100", interpretacion: "Debe ser 0%" },
+            { cat: "Control financiero", nombre: "% pagos conciliados", formula: "(Pagos conciliados / Total) × 100", interpretacion: "Cercano a 100%" }
         ],
         roles: [
             { rol: "Logística y Recolección", resp: "Validar la información operativa en campo", act: "- Registrar recolecciones en MUTA\n- Capturar kilos (netos/brutos)\n- Adjuntar evidencias (foto, firma, nombre)\n- Validar dirección y ejecución del servicio\n- Detectar incidencias (visitas en cero, retrasos)", etapa: "0. Validación operativa" },
@@ -99,18 +99,18 @@ const pdfData = {
         ],
         subprocesos: [],
         reglas: [
-            "No existe OC sin SC aprobada",
-            "Toda solicitud debe contar con validación de presupuesto (Finanzas)",
-            "El sistema verifica disponibilidad antes de aprobar",
-            "Si excede el presupuesto:<br>&emsp;  o Se bloquea el flujo<br>&emsp;  o Se notifica al responsable<br>&emsp;  o Se requiere autorización o rechazo",
-            "Toda excepción debe incluir justificación",
-            "Se registra en bitácora:<br>&emsp;  o Validación realizada<br>&emsp;  o Excepciones autorizadas o rechazadas<br>&emsp;  o Usuario, fecha y motivo",
-            "La SC no podrá ser creada si faltan campos requeridos.<br>&emsp;  o Variables:<br>&emsp;&emsp;    ▪ tipo_compra (Operativa, Mantenimiento, ertc)<br> &emsp;&emsp;   ▪ centro_costo<br>&emsp;&emsp;    ▪ descripcion<br>&emsp;&emsp;    ▪ cantidad<br>&emsp;&emsp;    ▪ fecha_requerida<br>&emsp;&emsp;    ▪ justificacion",
-            "Mínimo 2 cotizaciones (salvo excepción)",
-            "Justificación obligatoria en decisiones de compra",
-            "No se ejecuta pago sin:<br>&emsp;  o OC válida<br>&emsp;  o Recepción validada<br>&emsp;  o Factura correcta",
-            "Al seleccionar al proveedor, se debe evaluar la mejor opción costo-beneficio.<br>&emsp;  o Variables:<br>&emsp;&emsp;    ▪ precio<br>&emsp;&emsp;    ▪ tiempo_entrega<br>&emsp;&emsp;    ▪ score_proveedor",
-            "Si no se elige la mejor opción, se debe justificar."
+            "• No existe orden de compra (OC) sin solicitud de compra (SC) aprobada",
+            "• Toda solicitud debe contar con validación de presupuesto (Finanzas)",
+            "• El sistema verifica disponibilidad antes de aprobar",
+            "• Si excede el presupuesto:<br>&emsp;  o Se bloquea el flujo<br>&emsp;  o Se notifica al responsable<br>&emsp;  o Se requiere autorización o rechazo",
+            "• Toda excepción debe incluir justificación",
+            "• Se registra en bitácora:<br>&emsp;  o Validación realizada<br>&emsp;  o Excepciones autorizadas o rechazadas<br>&emsp;  o Usuario, fecha y motivo",
+            "• La SC no podrá ser creada si faltan campos requeridos.<br>&emsp;  o Variables:<br>&emsp;&emsp;    ▪ tipo_compra (Operativa, Mantenimiento, etc)<br> &emsp;&emsp;   ▪ centro_costo<br>&emsp;&emsp;    ▪ descripcion<br>&emsp;&emsp;    ▪ cantidad<br>&emsp;&emsp;    ▪ fecha_requerida<br>&emsp;&emsp;    ▪ justificacion",
+            "• Mínimo 2 cotizaciones (salvo excepción)",
+            "• Justificación obligatoria en decisiones de compra",
+            "• No se ejecuta pago sin:<br>&emsp;  o OC válida<br>&emsp;  o Recepción validada<br>&emsp;  o Factura correcta",
+            "• Al seleccionar al proveedor, se debe evaluar la mejor opción costo-beneficio.<br>&emsp;  o Variables:<br>&emsp;&emsp;    ▪ precio<br>&emsp;&emsp;    ▪ tiempo_entrega<br>&emsp;&emsp;    ▪ score_proveedor",
+            "• Si no se elige la mejor opción, se debe justificar."
         ],
         kpis: [
             { cat: "Eficiencia del proceso", nombre: "Tiempo total de compra", formula: "Fecha pago – Fecha solicitud", interpretacion: "Menor tiempo = mayor eficiencia" },
@@ -195,12 +195,12 @@ const pdfData = {
         ],
         subprocesos: [],
         reglas: [
-            "Todo producto debe estar registrado en el sistema antes de ser gestionado en el almacén.",
-            "Todo producto debe contar con un SKU único, estandarizado y no duplicado.",
-            "Todo producto debe tener una ubicación asignada dentro del almacén.",
-            "Todos los movimientos de inventario (entradas, salidas, ajustes) deben registrarse en tiempo real.",
-            "Reglas de recepción:<ul style='margin:4px 0 4px 20px;'><li>No se permite la recepción sin una Orden de Compra válida.</li><li>Toda recepción debe validarse contra la OC en cantidad y especificación.</li><li>Todo material debe pasar validación de calidad. Los que no cumplan se rechazan.</li><li>Debe ubicarse inmediatamente.</li></ul>",
-            "Reglas de inventario:<ul style='margin:4px 0 4px 20px;'><li>Monitoreo continuo mediante el sistema.</li><li>Conteos cíclicos periódicos conforme a programación.</li><li>Toda diferencia físico vs sistema se registra con causa raíz.</li><li>No se permiten ajustes sin justificación.</li></ul>"
+            "• Todo producto debe estar registrado en el sistema antes de ser gestionado en el almacén.",
+            "• Todo producto debe contar con un SKU único, estandarizado y no duplicado.",
+            "• Todo producto debe tener una ubicación asignada dentro del almacén.",
+            "• Todos los movimientos de inventario (entradas, salidas, ajustes) deben registrarse en tiempo real.",
+            "• Reglas de recepción:<ul style='margin:4px 0 4px 20px;'><li> o No se permite la recepción sin una Orden de Compra válida.</li><li> o Toda recepción debe validarse contra la OC en cantidad y especificación.</li><li> o Todo material debe pasar validación de calidad. Los que no cumplan se rechazan.</li><li> o Debe ubicarse inmediatamente.</li></ul>",
+            "• Reglas de inventario:<ul style='margin:4px 0 4px 20px;'><li>o Monitoreo continuo mediante el sistema.</li><li>o Conteos cíclicos periódicos conforme a programación.</li><li>o Toda diferencia físico vs sistema se registra con causa raíz.</li><li>o No se permiten ajustes sin justificación.</li></ul>"
         ],
         kpis: [
             { cat: "Inventario", nombre: "Exactitud de inventario (%)", formula: "(Inventario correcto / Inventario total) × 100", interpretacion: "Mide la confiabilidad del inventario. Un valor cercano a 100% indica control total." },
@@ -264,8 +264,8 @@ const pdfData = {
         ],
         subprocesos: [],
         reglas: [
-            "Generales<br>• Todo evento de mantenimiento debe ser registrado en el sistema con información mínima obligatoria.<br>  - Evento no registrado se considera inexistente.<br>• Todo evento debe contar con evidencia (fotográfica, checklist o documental) para poder avanzar en el flujo.<br>• Las decisiones del proceso deben basarse en criterios definidos (seguridad, legal, técnico, urgencia, costo), no en juicio personal.<br>• El sistema debe garantizar trazabilidad completa de cada evento desde su detección hasta su cierre.<br>• No se permite la ejecución de mantenimiento sin una orden de mantenimiento previamente generada.",
-            "Seguridad y cumplimmiento<br>• Ninguna unidad puede operar si representa riesgo para la seguridad de personas o activos.<br>• Ninguna unidad puede operar si incumple requisitos legales o normativos aplicables.<br>• Si una falla compromete seguridad o cumplimiento legal, la unidad debe cambiar automáticamente a estatus:<br>  - Fuera de servicio<br>• Los criterios de seguridad y cumplimiento legal prevalecen sobre cualquier consideración operativa o económica."
+            "Generales<br>• Todo evento de mantenimiento debe ser registrado en el sistema con información mínima obligatoria.<br>&emsp;  - Evento no registrado se considera inexistente.<br>• Todo evento debe contar con evidencia (fotográfica, checklist o documental) para poder avanzar en el flujo.<br>• Las decisiones del proceso deben basarse en criterios definidos (seguridad, legal, técnico, urgencia, costo), no en juicio personal.<br>• El sistema debe garantizar trazabilidad completa de cada evento desde su detección hasta su cierre.<br>• No se permite la ejecución de mantenimiento sin una orden de mantenimiento previamente generada.",
+            "Seguridad y cumplimmiento<br>• Ninguna unidad puede operar si representa riesgo para la seguridad de personas o activos.<br>• Ninguna unidad puede operar si incumple requisitos legales o normativos aplicables.<br>• Si una falla compromete seguridad o cumplimiento legal, la unidad debe cambiar automáticamente a estatus:<br>&emsp;  - Fuera de servicio<br>• Los criterios de seguridad y cumplimiento legal prevalecen sobre cualquier consideración operativa o económica."
         ],
         kpis: [
             { cat: "Disponibilidad", nombre: "Disponibilidad de unidades (%)", formula: "(Unidades disponibles / Total) × 100", interpretacion: "Qué porcentaje de unidades está listo para operar" },
