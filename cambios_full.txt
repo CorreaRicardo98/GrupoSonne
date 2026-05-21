@@ -1,0 +1,1874 @@
+En la sección de “Gestión de pagos” por favor agrega  lo siguiente 
+En la sección “Proceso TO-BE” agregar la información que corresponde correcta en las diferentes etapas, te adjunto
+“Validación Operativa (Antes de cada extracción)
+Actor: Logística y Recolección
+Actividades:
+Validar en campo:
+Registro de recolección
+Kilos capturados
+Evidencias (foto, firma, nombre)
+Dirección correcta
+Consideraciones:
+Las evidencias son obligatorias en MUTA (candado operativo)
+1. Extracción de datos desde MUTA
+Actor: Administración 
+Actividades:
+Descarga de reporte de recolecciones desde MUTA:
+Código interno generador
+Fecha de recolección
+Estado
+Dirección
+Metodo de pago*
+Tags Generador
+Id legal Generador = RFC*
+Kilos (netos/brutos)
+Precio
+Resultado:
+Dataset base de recolecciones
+2. Validación operativa (Filtro de registros)
+Actor: Administración
+Actividades:
+Filtrar registros con estado válido para pago:
+Completado
+Verificado
+Validar:
+Integridad de datos (RFC, kilos, precio)
+No duplicidad de registros
+️ Consideraciones:
+Las inconsistencias no bloquean el pago, pero deben registrarse como incidencias, darles seguimiento y corregirse en un flujo paralelo. Solo aquellas que afecten directamente el monto (kilos o precio) deberán resolverse antes del cálculo.
+Resultado:
+Registros válidos para procesamiento de pago
+3. Consolidación de información
+Actor: Administración
+Actividades:
+Agrupar información por:
+Cliente
+Periodo (día / semana / quincena)
+Aplicar reglas:
+Monto mínimo ($500)
+Exclusión de registros inválidos
+Resultado:
+Base consolidada por cliente y periodo
+4. Cálculo de pagos
+Actor: Administración
+Actividades:
+Calcular monto por cliente:
+Kilos x Precio (según contrato)
+Validar:
+Consistencia de kilos (MUTA vs sistema actual)
+Herramientas de validación IA (Prompt)
+Precio vigente
+Exclusiones:
+Penalizaciones (se gestionan en subproceso independiente)
+Resultado:
+Monto total a pagar por cliente
+5. Generación de Orden de Pago
+Actor: Administración
+Actividades:
+Generar documento orden de pago estándar que incluye:
+Cliente
+Periodo
+Kilos
+Monto total
+Referencia de recolecciones
+Enviar orden de pago al cliente
+Solicita factura
+Resultados:
+Orden de pago enviada
+6. Facturación (Cliente)
+Actor: Cliente
+Actividades:
+Recibir orden de pago
+Emitir factura
+Enviar factura
+Resultado: Factura emitida y enviada por el cliente, alineada con la orden de pago generada
+7. Recepción y validación de factura
+Actor: Administración
+Actividades:
+Recepción de factura por parte del cliente
+Validación de:
+RFC correcto
+Monto coincidente
+Datos fiscales completos
+Regla crítica:
+Sin factura → NO se procesa el pago
+Factura incorrecta → rechazo
+Factura válida → continuar con el proceso
+Resultado:
+Factura validada y autorizada
+8. Aprobación financiera
+Actor: Administración / Tesorería
+Actividades:
+Nivel 1: Administración
+Validación final de:
+Cálculo
+Orden de pago
+Factura
+Nivel 2: Tesorería
+Validación de:
+Disponibilidad de fondos
+Decisión:
+Rechazado → Corrección / Aplazamiento: El pago puede ser rechazado por errores en cálculo, factura o información, en cuyo caso se corrige y revalida. También puede aplazarse por causas operativas como falta de fondos o factura pendiente, sin reiniciar el proceso.
+Aprobado → ejecución
+Resultado:
+Pago autorizado
+9. Ejecución del pago
+Actor: Tesorería
+Actividades:
+Realizar transferencia (SPEI / bancaria)
+Registrar:
+Referencia bancaria
+Fecha de pago
+Monto pagado
+Resultado:
+Pago ejecutado
+10. Notificación al cliente
+Actor: Administración
+Actividades:
+Enviar confirmación de pago:
+Comprobante
+Detalle del pago
+Resultado:
+Cliente notificado
+11. Registro y conciliación
+Actor: Administración / Finanzas
+Actividades:
+Registro contable del pago
+Conciliación bancaria
+Cierre del periodo
+Resultado:
+Proceso cerrado y conciliado
+”
+En la misma sección de “Proceso TO-BE” agrega los subprocesos relacionados, te adjunto la información
+“Subproceso relacionado “Gestión de Penalizaciones”
+Se gestiona fuera del flujo principal
+No bloquea pagos
+Puede afectar ajustes posteriores o compensaciones
+Penalizaciones a Clientes se aplican cuando el cliente incumple condiciones acordadas, por ejemplo:
+Entrega de material fuera de especificación (contaminación, mezcla indebida)
+Diferencias relevantes entre volumen reportado vs recibido
+Incumplimiento de condiciones logísticas (accesos, tiempos, preparación)
+Visitas en cero
+Retrasos en servicio
+Falta de cumplimiento en procesos administrativos (ej. retraso en facturación, si se decide aplicar)
+Impacto:
+Ajuste en el monto a pagar (reducción)
+Registro como incidencia contractual
+Penalizaciones a Proveedores, se aplican cuando la operación interna o proveedores incumplen estándares definidos, por ejemplos:
+Registro incorrecto de datos (kilos, dirección, cliente)
+Retrasos operativos
+Impacto:
+Puede generar:
+Ajustes internos
+Evaluación de desempeño
+Penalización económica interna (si aplica)
+Subproceso Relacionado “Soporte TI”
+Soporte a incidencias operativas, se atienden problemas relacionados con el uso del sistema en la operación diaria, por ejemplo:
+Error en la descarga de reportes de MUTA
+Fallas en accesos o permisos de usuarios
+Problemas en visualización de información (precios, kilos, estados)
+Soporte a calidad de datos, se enfoca en la corrección y validación de información utilizada en pagos, por ejemplo:
+Corrección de direcciones incorrectas
+Ajustes en registros duplicados
+Soporte evolutivo (mejoras al sistema), se enfoca en la evolución del sistema para mejorar el proceso, por ejemplo:
+Incorporación de nuevos campos requeridos
+Ajustes en reportes de MUTA
+”
+En la sección de “Reglas de negocio”, falta información, así que te agrego la información que debe de ir correcta
+“Validación de información
+Integridad de datos obligatoria, todo registro de recolección debe contar con:
+RFC del cliente 
+Kilos 
+Precio 
+Estado válido
+Estados válidos para pago, solo se procesan registros con estado:
+Verificado
+No se permiten procesar registros duplicados:
+Variables:
+ID_Recolección 
+Fecha_Recolección 
+Cliente 
+Clave única sugerida:ID_Recolección + Fecha_Recolección + Cliente
+MUTA es la única fuente de datos operativos para el pago.
+Manejo de inconsistencias, las inconsistencias:
+No bloquean el flujo 
+Se registran como incidencias 
+Excepción:Si afectan el monto (kilos o precio) → deben corregirse antes del cálculo
+Cálculo de pagos
+La base para el cálculo es sobre los Kilos Netos 
+El monto se calcula de la siguiente manera:
+Fórmula:Monto_Pago = Kilos_Netos × Precio_Contrato
+El precio por kilo debe estar definido en el contrato y debe de coincidir con el registro en MUTA.
+Las penalizaciones no afectan el cálculo inicial y se gestionan en un subproceso independiente llamado “Gestión de Penalizaciones”
+Reglas financieras
+Pagos menores a $500 no se procesan y se acumulan.
+Regla:
+Si Monto_Pago < Monto_Mínimo → se acumula 
+Si Monto_Pago ≥ Monto_Mínimo → se paga
+Los pagos solo se ejecutan en periodos definidos:
+Principios de mes
+Finales de mes
+Todo pago debe contar con un folio único.
+Facturación
+No se puede ejecutar un pago sin factura válida.
+La factura debe pasar por una validación fiscal considerando las siguientes variables:
+RFC_Factura 
+Monto_Factura 
+Datos_Fiscales
+Debe cumplir:
+RFC correcto 
+Monto coincide con orden 
+Datos completos
+El monto de la factura debe coincidir con la orden de pago.
+Regla:Monto_Factura = Monto_Orden_Pago         
+Operación y control
+Las evidencias son obligatorias en MUTA, pero no bloquean el pago:
+Foto 
+Firma 
+Nombre
+Las inconsistencias deben registrarse, clasificarse y tener seguimiento, pero sin detener el proceso.
+Todo cambio en datos (precio, kilos, cliente) debe quedar registrado en un historial
+Debe existir separación de funciones entre validación (Administración) y ejecución (Tesorería).
+Todo pago debe quedar registrado en el sistema, incluyendo su estado: realizado, pendiente o acumulado para periodos posteriores.
+No se puede ejecutar un pago si no se cumple:
+Validación → Cálculo → Factura → Aprobación 
+Reglas de penalizaciones
+Las penalizaciones se establecen en contrato y pueden ser aplicables considerando los siguientes pasos:
+Visitas en cero 
+Retrasos en servicio 
+Incumplimientos operativos
+”
+En la sección de Roles y responsabilidades falta información tambien, ter adjunto la tabla correcta que debe de ir , considera toda la información
+Rol / Actor
+Responsabilidad
+Actividades clave
+Etapas donde participa
+Logística y Recolección
+Validar la información operativa en campo
+- Registrar recolecciones en MUTA 
+- Capturar kilos (netos/brutos) 
+- Adjuntar evidencias (foto, firma, nombre)
+- Validar dirección y ejecución del servicio 
+- Detectar incidencias (visitas en cero, retrasos)
+0. Validación operativa
+Administración (Back Office / Pagos)
+Gestionar el proceso completo de pagos (rol core)
+- Descargar datos de MUTA 
+- Validar información (RFC, kilos, precio, estado) - Eliminar duplicados 
+- Registrar incidencias 
+- Consolidar información por cliente/periodo 
+- Aplicar reglas (mínimo $500) - Calcular pagos (kilos netos × precio) 
+- Generar orden de pago 
+- Enviar orden y solicitar factura - Validar factura 
+- Gestionar correcciones 
+- Notificar al cliente
+1. Extracción 
+2. Validación administrativa 
+3. Consolidación 
+4. Cálculo 
+5. Orden de pago 
+7. Validación de factura 
+8. Aprobación (Nivel 1) 
+9. Notificación
+Cliente (Generador)
+Emitir factura y recibir pago
+- Recibir orden de pago 
+- Generar factura 
+- Enviar factura a Sonne 
+- Atender correcciones si aplica 
+- Confirmar recepción del pago
+6. Facturación 
+7. Corrección de factura 
+9. Recepción de notificación
+Tesorería
+Validar y ejecutar el pago
+- Validar disponibilidad de fondos 
+- Aprobar pago (nivel 2) 
+- Ejecutar transferencia bancaria 
+- Registrar referencia de pago 
+- Reprogramar pagos si no hay fondos
+8. Aprobación (Nivel 2) 
+9. Ejecución del pago
+Contabilidad / Finanzas
+Registrar y conciliar los pagos
+-  Registrar pago en sistema contable 
+- Conciliar contra banco 
+- Validar cierre de periodo 
+- Generar reportes financieros
+10. Registro y conciliación
+ (Soporte TI)
+Garantizar disponibilidad, calidad de datos y soporte técnico
+- Soporte a incidencias en MUTA 
+- Validar y corregir datos (kilos, direcciones, precios) 
+- Ajustar reportes o campos 
+- Soporte en automatización (IA, integraciones) 
+- Mantener trazabilidad de cambios
+Transversal (todas las etapas)
+Administración (Control / Auditoría interna) 
+Control y trazabilidad del proceso
+- Mantener bitácora de pagos (realizados / pendientes) 
+- Mantener bitácora de cambios (precios, kilos, clientes) 
+- Validar cumplimiento de reglas
+- Seguimiento a incidencias
+Transversal (control del proceso)
+En la sección de Diagrama de flujo, no se esta presentando así que te adjunto la imagen que debe de ir en la sección de “Gestión de pagos”
+En la sección de “Gestión de compras” por favor agrega  lo siguiente
+En la sección “Proceso TO-BE” agregar la información que corresponde correcta en las diferentes etapas, te adjunto lo que debes de plasmás correcto “
+1.- Detección de necesidad
+Actor: Solicitante / Sistema
+La necesidad puede originarse por:
+Requerimiento operativo (usuario)
+Stock mínimo (inventario)
+Mantenimiento programado (operaciones / MUTA)
+El sistema puede sugerir:
+Proveedores frecuentes
+Precios históricos
+Tiempos de entrega
+Resultado
+Requerimiento identificado y listo para formalización
+2.- Creación de Solicitud de Compra (SC)
+Actor: Solicitante
+Captura en sistema con campos obligatorios:
+Tipo de compra (operativa, CAPEX, mantenimiento)
+Centro de costo
+Cantidad y descripción
+Fecha requerida
+Justificación del requerimiento
+Validaciones automáticas:
+Catálogo de productos/servicios
+Campos obligatorios completos
+Resultado:
+Solicitud de Compra registrada (estatus: “Pendiente validación”)
+3.- Validación Presupuestal 
+Actor: Finanzas
+Validación de:
+Disponibilidad presupuestal
+Partida contable
+Centro de costo
+Posibles escenarios:
+Aprobado → se asigna presupuesto
+Rechazado → regresa a solicitante
+Ajuste → modificación de monto o alcance
+Resultado:
+SC aprobada con presupuesto asignado
+4.- Flujo de Aprobación
+Actor: Sistema + Aprobador
+Flujo automático basado en:
+Monto de compra
+Tipo de compra
+Área
+Niveles de aprobación configurables:
+Jefe directo
+Gerencia
+Dirección
+Notificaciones automáticas
+Resultado:
+SC aprobada / rechazada
+5.-Proceso de Cotización
+Actor: Compras
+Envío de solicitudes de cotización a proveedores
+Recepción de propuestas en sistema
+Comparación automática:
+Precio
+Tiempo de entrega
+Condiciones comerciales
+Score histórico del proveedo
+Resultado:
+Cuadro comparativo de cotizaciones
+6.-Selección de Proveedor 
+Actor: Compras
+Análisis de propuestas
+Selección del proveedor óptimo (costo-beneficio)
+Regla clave:
+Si no se selecciona la mejor opción → justificar en sistema
+Registro de decisión
+Resultado:
+Proveedor seleccionado
+7.- Generación de Orden de Compra (OC)
+Actor: Sistema + Compras
+Generación automática de OC basada en SC aprobada
+Inclusión de:
+Datos del proveedor
+Condiciones de pago
+Fecha de entrega
+Envío automático al proveedor
+Resultado:
+OC emitida y enviada
+8.-Recepción de Bienes/Servicios
+Actor: Almacén / Operaciones
+Recepción física o validación del servicio
+Comparación contra OC:
+Cantidad
+Calidad
+Registro de evidencia:
+Fotos
+Firma
+Documentos
+Manejo de incidencias:
+Rechazo parcial o total
+Resultado:
+Recepción registrada (Aceptada / Rechazada)
+9.-Validación de Factura 
+Actor: Sistema + Compras
+Validación automática:
+Orden de compra (OC)
+Recepción
+Factura
+Escenarios:
+Coincide → pasa a pago
+No coincide → bloqueo + incidencia
+Resultado:
+Factura validada
+10.- Ejecución de Pago 
+Actor: Tesorería
+Programación de pago según:
+Condiciones acordadas
+Flujo de caja
+Ejecución del pago
+Registro en sistema
+Notificación al proveedo
+Resultado:
+Pago realizado
+”
+En la sección de Reglas de negocio, tienes que agregar correctamente la información ya que actualmente la mostraste incompleta, te adjunto la información correcta que debes de plasmar
+“No existe OC sin SC aprobada
+Toda solicitud debe contar con validación de presupuesto (Finanzas) 
+El sistema verifica disponibilidad antes de aprobar 
+Si excede el presupuesto: 
+Se bloquea el flujo 
+Se notifica al responsable 
+Se requiere autorización o rechazo 
+Toda excepción debe incluir justificación 
+Se registra en bitácora: 
+Validación realizada 
+Excepciones autorizadas o rechazadas 
+Usuario, fecha y motivo
+La SC no podrá ser creada si faltan campos requeridos.
+Variables:
+tipo_compra (Operativa, Mantenimiento, ertc) 
+centro_costo 
+descripcion 
+cantidad 
+fecha_requerida 
+justificacion
+Mínimo 2 cotizaciones (salvo excepción)
+Justificación obligatoria en decisiones de compra
+No se ejecuta pago sin:
+OC válida
+Recepción validada
+Factura correcta
+Al seleccionar al proveedor, se debe evaluar la mejor opción costo-beneficio.
+Variables:
+precio 
+tiempo_entrega 
+score_proveedor
+Si no se elige la mejor opción, se debe justificar.
+”
+En la sección de KPIs de gestión de compras por favor muestra la siguiente tabla completa
+Categoría
+KPI
+¿Qué mide?
+Fórmula
+Interpretación
+Eficiencia del proceso
+Tiempo total de compra
+Tiempo de inicio a fin del proceso
+Fecha pago – Fecha solicitud
+Menor tiempo = mayor eficiencia
+Eficiencia del proceso
+Tiempo de aprobación
+Tiempo en aprobar SC
+Fecha aprobación – Fecha solicitud
+Alto = cuellos de botella
+Eficiencia del proceso
+Tiempo generación OC
+Tiempo en emitir orden de compra
+Fecha OC – Fecha aprobación
+Mide eficiencia de Compras
+Eficiencia del proceso
+Tiempo de pago
+Tiempo en pagar tras validación
+Fecha pago – Fecha factura validada
+Impacta relación con proveedor
+Control del dinero
+% compras dentro de presupuesto
+Cumplimiento del presupuesto
+(Compras dentro / total) ×100
+Alto = buen control financiero
+Control del dinero
+% desviación presupuestal
+Exceso de gasto
+(Gasto real – presupuesto) / presupuesto ×100
+Alto = sobrecostos
+Control del dinero
+Ahorro en compras
+Ahorro logrado
+(Precio estimado – real) / estimado ×100
+Alto = buena negociación
+Control del dinero
+% compras con excepción
+Compras fuera de estándar
+(Compras excepción / total) ×100
+Alto = riesgo de malas decisiones
+Gestión de compras
+% compras con RFQ
+Uso de cotizaciones
+(Compras con RFQ / total) ×100
+Alto = mayor control
+Gestión de compras
+Tiempo selección proveedor
+Tiempo en elegir proveedor
+Fecha selección – fecha cotización
+Bajo = eficiencia
+Gestión de compras
+% cumplimiento proceso
+Uso correcto del flujo
+(Compras correctas / total) ×100
+Bajo = riesgo de auditoría
+Entregas y operación
+% entregas a tiempo
+Cumplimiento proveedor
+(Entregas a tiempo / total) ×100
+Bajo = proveedor deficiente
+Entregas y operación
+% entregas sin error
+Calidad de entrega
+(Entregas correctas / total) ×100
+Bajo = problemas operativos
+Entregas y operación
+% incidencias
+Problemas en recepción
+(Recepciones con error / total) ×100
+Alto = fallas operativas
+Pagos (Tesorería)
+% pagos a tiempo
+Cumplimiento de pago
+(Pagos a tiempo / total) ×100
+Alto = buena tesorería
+Pagos (Tesorería)
+Tiempo promedio de pago
+Tiempo promedio para pagar
+Promedio (Fecha pago – factura)
+Bajo = buena liquidez
+Pagos (Tesorería)
+% pagos con error
+Pagos incorrectos
+(Pagos con error / total) ×100
+Alto = riesgo financiero
+Control y cumplimiento
+% compras fuera del proceso
+Compras no controladas
+(Compras fuera / total) ×100
+Alto = riesgo de fraude
+Control y cumplimiento
+% compras urgentes
+Nivel de planeación
+(Compras urgentes / total) ×100
+Alto = mala planeación
+Control y cumplimiento
+% cumplimiento 
+Validación correcta
+(Pagos validados / total) ×100
+Bajo = riesgo de pago indebido
+Proveedores
+Calificación de proveedores
+Desempeño general
+Promedio (calidad + tiempo + cumplimiento)
+Bajo = proveedor riesgoso
+Proveedores
+% proveedores evaluados
+Nivel de control
+(Evaluados / total) ×100
+Bajo = falta de seguimiento
+Operación 
+Indicador de compras (volumen)
+Número de compras
+Total SC/OC en periodo
+Mide carga operativa
+Operación 
+Tiempo por solicitud
+Tiempo promedio por SC
+Promedio (Fecha fin – inicio)
+Mide eficiencia por caso
+En la sección de role sy responsabilidades falta información te voy adjuntar la tabla que debes de presentar correctamente, es la siguiente:
+Categoría
+KPI
+¿Qué mide?
+Fórmula
+Interpretación
+Eficiencia del proceso
+Tiempo total de compra
+Tiempo de inicio a fin del proceso
+Fecha pago – Fecha solicitud
+Menor tiempo = mayor eficiencia
+Eficiencia del proceso
+Tiempo de aprobación
+Tiempo en aprobar SC
+Fecha aprobación – Fecha solicitud
+Alto = cuellos de botella
+Eficiencia del proceso
+Tiempo generación OC
+Tiempo en emitir orden de compra
+Fecha OC – Fecha aprobación
+Mide eficiencia de Compras
+Eficiencia del proceso
+Tiempo de pago
+Tiempo en pagar tras validación
+Fecha pago – Fecha factura validada
+Impacta relación con proveedor
+Control del dinero
+% compras dentro de presupuesto
+Cumplimiento del presupuesto
+(Compras dentro / total) ×100
+Alto = buen control financiero
+Control del dinero
+% desviación presupuestal
+Exceso de gasto
+(Gasto real – presupuesto) / presupuesto ×100
+Alto = sobrecostos
+Control del dinero
+Ahorro en compras
+Ahorro logrado
+(Precio estimado – real) / estimado ×100
+Alto = buena negociación
+Control del dinero
+% compras con excepción
+Compras fuera de estándar
+(Compras excepción / total) ×100
+Alto = riesgo de malas decisiones
+Gestión de compras
+% compras con RFQ
+Uso de cotizaciones
+(Compras con RFQ / total) ×100
+Alto = mayor control
+Gestión de compras
+Tiempo selección proveedor
+Tiempo en elegir proveedor
+Fecha selección – fecha cotización
+Bajo = eficiencia
+Gestión de compras
+% cumplimiento proceso
+Uso correcto del flujo
+(Compras correctas / total) ×100
+Bajo = riesgo de auditoría
+Entregas y operación
+% entregas a tiempo
+Cumplimiento proveedor
+(Entregas a tiempo / total) ×100
+Bajo = proveedor deficiente
+Entregas y operación
+% entregas sin error
+Calidad de entrega
+(Entregas correctas / total) ×100
+Bajo = problemas operativos
+Entregas y operación
+% incidencias
+Problemas en recepción
+(Recepciones con error / total) ×100
+Alto = fallas operativas
+Pagos (Tesorería)
+% pagos a tiempo
+Cumplimiento de pago
+(Pagos a tiempo / total) ×100
+Alto = buena tesorería
+Pagos (Tesorería)
+Tiempo promedio de pago
+Tiempo promedio para pagar
+Promedio (Fecha pago – factura)
+Bajo = buena liquidez
+Pagos (Tesorería)
+% pagos con error
+Pagos incorrectos
+(Pagos con error / total) ×100
+Alto = riesgo financiero
+Control y cumplimiento
+% compras fuera del proceso
+Compras no controladas
+(Compras fuera / total) ×100
+Alto = riesgo de fraude
+Control y cumplimiento
+% compras urgentes
+Nivel de planeación
+(Compras urgentes / total) ×100
+Alto = mala planeación
+Control y cumplimiento
+% cumplimiento 
+Validación correcta
+(Pagos validados / total) ×100
+Bajo = riesgo de pago indebido
+Proveedores
+Calificación de proveedores
+Desempeño general
+Promedio (calidad + tiempo + cumplimiento)
+Bajo = proveedor riesgoso
+Proveedores
+% proveedores evaluados
+Nivel de control
+(Evaluados / total) ×100
+Bajo = falta de seguimiento
+Operación 
+Indicador de compras (volumen)
+Número de compras
+Total SC/OC en periodo
+Mide carga operativa
+Operación 
+Tiempo por solicitud
+Tiempo promedio por SC
+Promedio (Fecha fin – inicio)
+Mide eficiencia por caso
+En la sección de “Matriz de riesgo y control” falta información, así que te adjunto la tabla correcta que debe de ir, es la siguiente: 
+Riesgo
+Causa
+Impacto
+Control
+Tipo
+Responsable
+Compra sin necesidad real
+Falta de validación del requerimiento
+Gasto innecesario
+Justificación obligatoria en SC + aprobación
+Preventivo
+Aprobador
+Compra sin presupuesto
+No validación financiera
+Sobregasto
+Validación presupuestal obligatoria
+Preventivo
+Finanzas
+Sobregasto no controlado
+Exceso de compras acumuladas
+Desviación financiera
+Control de presupuesto en tiempo real + alertas
+Preventivo
+Finanzas
+Aprobaciones indebidas
+Falta de control en roles
+Fraude
+Workflow automatizado + jerarquías
+Preventivo
+Sistema
+Falta de segregación de funciones
+Mismo usuario controla todo
+Riesgo de fraude
+Separación: Finanzas ≠ Compras ≠ Tesorería
+Preventivo
+Dirección
+Selección de proveedor inadecuado
+Falta de comparativa
+Sobreprecio / mala calidad
+Mínimo 2 cotizaciones (RFQ)
+Preventivo
+Compras
+Favoritismo a proveedores
+Falta de transparencia
+Corrupción
+Justificación obligatoria de selección
+Detectivo
+Compras / Auditoría
+Error en Orden de Compra
+Datos incorrectos
+Retrasos / pagos erróneos
+Generación automática de OC
+Preventivo
+Sistema
+Recepción incorrecta
+No validación contra OC
+Pérdida económica
+Validación física vs OC + evidencia
+Preventivo
+Almacén
+Recepción no registrada
+Omisión del proceso
+Falta de trazabilidad
+Registro obligatorio en sistema
+Preventivo
+Sistema
+Pago sin validación
+Falta de control documental
+Fraude / pago indebido
+Validación 3-way match
+Preventivo
+Sistema
+Factura duplicada
+Falta de control
+Pago duplicado
+Validación de folio único
+Preventivo
+Sistema / Tesorería
+Pago fuera de condiciones
+Mala programación
+Problemas de flujo de caja
+Programación automática de pagos
+Preventivo
+Tesorería
+Pagos incorrectos
+Error humano
+Pérdida económica
+Validación previa + controles de pago
+Detectivo
+Tesorería
+Compras fuera del proceso
+Falta de control
+Riesgo de fraude
+KPI + auditoría de compras
+Detectivo
+Auditoría
+Exceso de compras urgentes
+Mala planeación
+Costos elevados
+Alertas de compras urgentes
+Detectivo
+Sistema
+Falta de trazabilidad
+Procesos manuales
+Problemas de auditoría
+Bitácora completa del proceso
+Preventivo
+Sistema
+Incidencias no gestionadas
+Falta de seguimiento
+Impacto operativo
+Bitácora de incidencias + seguimiento
+Detectivo
+Compras
+En la sección de Diagrama de flujo, no se esta presentando así que te adjunto la imagen que debe de ir en la sección de “Gestión de compras”
+En la sección de “Gestión de Almacén” por favor agrega  lo siguiente 
+En la sección “Proceso TO-BE” agregar la información que corresponde correcta en las diferentes etapas, te adjunto
+“1.- Planeación de Inventarios 
+Se realiza una planeación mensual integrada con operaciones, utilizando datos históricos y variables del negocio.
+Actor principal: Planeación / Operaciones
+Áreas operativas definen necesidades mensuales
+Se realiza el análisis de consumo histórico por producto
+Clasificación de productos:
+Críticos: deben mantenerse siempre en stock
+Bajo demanda: se compran contra necesidad
+Se realiza evaluación de variables:
+Precio
+Rotación
+Disponibilidad
+Espacio en almacén
+Se establecen niveles de inventario:
+Stock mínimo
+Stock máximo
+Punto de reorden
+Resultado:
+Plan de abastecimiento
+Niveles de inventario
+2.- Organización del Almacén 
+Se estructura el almacén de forma estandarizada para asegurar trazabilidad y control.
+Actor principal: Almacén
+Definir estructura de almacenes (tipos y jerarquía)
+Estandarizar ubicaciones:
+Zona
+Rack
+Nivel
+Posición
+Normalizar catálogo y SKU
+Asignar ubicación a cada producto
+Implementar identificación visual:
+Etiquetas
+Códigos
+Fotografías
+Resultado:
+Almacen estructurado y actualizado
+Catálogo estandarizado
+3.- Recepción de Materiales 
+Proceso estructurado de ingreso de materiales con validación total.
+Actor principal: Almacén
+Recibir material contra Orden de Compra
+Valida:
+Cantidad
+Calidad
+Evaluar condición del material
+Decisión:
+No cumple → rechazo / devolución
+Cumple → continuar
+Registrar entrada en sistema en tiempo real
+Generar evidencia (opcional)
+Asignar ubicación
+Resultado:
+Inventario actualizado
+Registro de entrada
+4.- Control de Inventario 
+Se mantiene control continuo del inventario asegurando su exactitud
+Actor principal: Almacén, 
+Participa: Auditoría / Supervisión, Dirección (para validaciones críticas)/sistema
+Monitoreo continuo
+Consultar inventario en sistema
+Validar niveles por producto
+Validación contra niveles definidos
+Comparar contra:
+Stock mínimo
+Punto de reorden
+Decisión: ¿Se requiere reabastecimiento?
+Condiciones:
+Inventario < stock mínimo
+Producto crítico sin disponibilidad
+Proyección de consumo supera inventario
+Generación de requisición de compra (conexión con proceso de compras)
+Actividades:
+Identificación producto(s) a reabastecer
+Definir cantidad sugerida
+Genera requisición en sistema
+Registrar:
+Producto
+Cantidad
+Justificación
+Fecha
+Enviar requisición al área de Compras
+Integración con proceso de Compras
+La requisición se convierte en entrada formal del proceso de Compras
+Control de inventario interno
+Realizar conteos cíclicos
+Identificar diferencias
+Registrar ajustes con causa raíz
+Actualizar sistema
+Resultado:
+Requisiciones de compra
+Inventario actualizado
+Registro de ajustes
+5.- Control de Salidas 
+Gestión controlada de salidas de materiales con clasificación y trazabilidad.
+Actor principal: Almacén
+Participa: Operaciones (solicitud) y Supervisión/Dirección (autorización).
+Se recibe solicitud de salida
+Se clasifica el tipo de salida:
+Con autorización
+Sin autorización
+Contra cambio
+Se valida disponibilidad
+Autorizar salida (si aplica – Supervisión/Dirección)
+Preparación de pedido (picking estructurado)
+Registro en sistema antes de entrega
+Entrega del material
+Resultado:
+Inventario actualizado
+Salida registrada
+6.- Control y Orden del Almacén
+Garantizar que el almacén físico y el sistema estén completamente alineados.
+Actor principal: Almacén
+Participa: Auditoría y Supervisión
+Validación sistema vs inventario físico
+Implementación de orden y limpieza 
+Identificación visual de productos y ubicaciones
+Supervisar cumplimiento (Supervisión)
+definir periodos de auditorías programadas (1 por mes)
+Resultado:
+Almacén organizado
+Inventario alineado
+7.- Evaluación y Auditoría
+Se mide el desempeño del proceso mediante indicadores y auditorías.
+Actor principal: Auditoría / Supervisión
+Participa: Sistemas y Dirección
+Se realizan auditorías periódicas programadas
+Medir indicadores (Sistemas)
+Analizar desviaciones (Dirección) 
+Generación de reportes
+Resultado:
+Reportes de auditoría
+Indicadores de desempeño (KPIs)
+8.- Retroalimentación y Mejora Continua
+Gestión formal de mejora del proceso basada en resultados.
+Actor principal: Dirección / Administración
+Participa: Supervisión y Operaciones
+Revisión periódica de KPIs
+Realizar sesiones formales de retroalimentación
+Definición de acciones correctivas (Operaciones)
+Seguimiento y cierre (Supervisión)
+Resultado:
+Plan de mejora
+Acciones implementadas
+”
+En la sección de “Reglas de Negocio” no se están presentando toda la información, te adjunto lo que debe de contener esta sección correctamente, es lo siguiente
+“Reglas de Negocio Generales:
+Todo producto debe estar registrado en el sistema antes de ser gestionado en el almacén.
+Todo producto debe contar con un SKU único, estandarizado y no duplicado.
+Todo producto debe tener una ubicación asignada dentro del almacén.
+Todos los movimientos de inventario (entradas, salidas, ajustes) deben registrarse en tiempo real.
+Reglas de Negocio de recepción:
+No se permite la recepción de materiales sin una Orden de Compra válida.
+Toda recepción debe validarse contra la Orden de Compra en cantidad y especificación.
+Todo material recibido debe pasar por una validación de calidad antes de ser ingresado al inventario.
+Los materiales que no cumplan con los criterios de calidad deben ser rechazados o gestionados como devolución.
+Toda recepción debe registrarse en el sistema en tiempo real antes de ser almacenada.
+Todo material recibido debe ser ubicado inmediatamente en una ubicación definida dentro del almacén.
+Reglas de Negocio de inventario:
+El inventario debe ser monitoreado de forma continua mediante el sistema.
+Se deben realizar conteos cíclicos periódicos conforme a una programación definida.
+Toda diferencia entre inventario físico y sistema debe registrarse y documentarse con causa raíz.
+Reglas de Negocio de salidas:
+El inventario debe ser monitoreado de forma continua mediante el sistema.
+Se deben realizar conteos cíclicos periódicos conforme a una programación definida.
+Toda diferencia entre inventario físico y sistema debe registrarse y documentarse con causa raíz.
+No se permiten ajustes de inventario sin justificación documentada.
+”
+La sección de KPIs tambien no se está mostrando la información correcta, te adjunto la tabla que debe de ir con toda la in formaición que debes de agregar:
+KPI
+¿Qué mide?
+Fórmula
+Interpretación
+Exactitud de inventario (%)
+Nivel de coincidencia entre inventario físico y sistema
+(Inventario correcto / Inventario total) × 100
+Mide la confiabilidad del inventario. Un valor cercano a 100% indica control total.
+Nivel de trazabilidad (%)
+Porcentaje de movimientos correctamente registrados
+(Movimientos registrados / Movimientos totales) × 100
+Indica qué tan controlado está el flujo de inventario. 100% = trazabilidad total.
+Diferencias inventario físico vs sistema
+Desviaciones entre inventario real y sistema
+Inventario físico – Inventario sistema
+Permite detectar errores, pérdidas o fallas de control. Debe tender a 0.
+Tiempo de recepción
+Tiempo desde que llega el material hasta su registro en sistema
+Hora registro – Hora recepción
+Evalúa la eficiencia del proceso de recepción. Ideal: registro en tiempo real.
+Tiempo de atención
+Tiempo desde solicitud hasta inicio de atención
+Hora inicio atención – Hora solicitud
+Mide la capacidad de respuesta del almacén. Menor tiempo = mayor eficiencia.
+Número de salidas por día
+Cantidad de movimientos de salida realizados diariamente
+Total de salidas en el día
+Mide la carga operativa y productividad del almacén.
+Nivel de cumplimiento de pedidos (%)
+Pedidos entregados completos y en tiempo
+(Pedidos cumplidos / Pedidos totales) × 100
+Mide el nivel de servicio. Valores altos indican eficiencia operativa.
+% de movimientos registrados en tiempo real
+Grado de cumplimiento del registro inmediato en sistema
+(Movimientos en tiempo real / Movimientos totales) × 100
+Evalúa la adopción del sistema y control operativo. Objetivo: 100%.
+% de incidencias general
+Frecuencia de errores en entradas, salidas o inventario
+(Incidencias totales / Movimientos totales) × 100
+Permite identificar fallas operativas. Debe ser lo más bajo posible.
+% de recepciones con incidencias
+Recepciones con errores de cantidad o calidad
+(Recepciones con error / Recepciones totales) × 100
+Evalúa calidad del proceso de recepción y proveedores.
+Tiempo de validación en recepción
+Tiempo de revisión de calidad y cantidad
+Hora validación – Hora recepción
+Mide eficiencia del control de calidad.
+Nivel de cumplimiento (%) (Orden y control)
+Nivel de orden, limpieza y organización del almacén (5S)
+(Puntos cumplidos / Puntos evaluados) × 100
+Evalúa disciplina operativa. Impacta directamente en eficiencia y errores.
+Alineación sistema vs inventario físico (%)
+Coincidencia entre sistema y realidad
+(Productos correctos / Productos revisados) × 100
+Mide control general del almacén. Ideal: ≥ 98%.
+En la sección de roles y responsabilidades no estás presentando la información completa, así que te adjunto la tabla que debes de mostrar con su información completa
+Actor
+Responsabilidad
+Actividad clave
+Etapas donde actua
+Planeación / Operaciones
+Definir la demanda y necesidades de inventario alineadas a la operación
+- Proyectar demanda mensual 
+- Analizar consumo histórico
+ - Clasificar productos (críticos / bajo demanda) 
+- Definir niveles de inventario
+Planeación de inventarios
+Compras
+Abastecer materiales conforme a la planeación definida
+- Generar órdenes de compra 
+- Coordinar entregas con proveedores 
+- Asegurar disponibilidad de materiales
+Planeación / Recepción
+Almacén
+Gestionar el control operativo del inventario físico y digital
+- Recepción de materiales 
+- Registro de entradas y salidas en sistema 
+- Asignación de ubicaciones 
+- Preparación de pedidos (picking) 
+- Control de inventario - Ejecución de conteos cíclicos
+Organización / Recepción / Inventario / Salidas / Control
+Calidad
+Validar que los materiales cumplan con los estándares requeridos
+- Inspección de calidad en recepción 
+- Validación de condiciones del producto 
+- Aprobación o rechazo de materiales
+Recepción
+Auditoría / Supervisión
+Asegurar cumplimiento del proceso y exactitud del inventario
+- Auditorías periódicas - Validación físico vs sistema 
+- Identificación de desviaciones
+ - Seguimiento a diferencias
+Evaluación / Control
+Dirección / Administración
+Dar seguimiento estratégico al desempeño del almacén
+- Revisión de KPIs 
+- Toma de decisiones estratégicas 
+- Priorización de acciones de mejora
+Evaluación / Retroalimentación
+En la sección de “Matrix de riesgos y control”, tambien no estás mostrando la información correcta que debe de estár, así que te adjunto la tabla que debes de plasmar en esa sección con toda la información que quiero que muestres
+Etapa del proceso
+Riesgo
+Impacto
+Probabilidad
+Nivel de riesgo
+Control
+Tipo de control
+Responsable
+Planeación
+Planeación incorrecta de inventarios
+Falta o exceso de stock
+Media
+Alto
+Planeación basada en históricos + validación con operaciones
+Preventivo
+Planeación
+Planeación
+No clasificación de productos (críticos / demanda)
+Desabasto de productos críticos
+Media
+Alto
+Clasificación obligatoria de productos
+Preventivo
+Planeación
+Organización
+Ubicaciones no estandarizadas
+Pérdida de trazabilidad
+Alta
+Alto
+Estructura definida de ubicaciones (zona, rack, nivel)
+Preventivo
+Almacén
+Organización
+SKU duplicados o mal definidos
+Errores en inventario
+Media
+Alto
+Catálogo centralizado y validado
+Preventivo
+Sistemas / Almacén
+Recepción
+Recepción sin orden de compra
+Ingreso no controlado de material
+Baja
+Alto
+Bloqueo de recepción sin OC
+Preventivo
+Almacén
+Recepción
+Error en validación de cantidad o calidad
+Inventario incorrecto
+Media
+Alto
+Validación obligatoria + control de calidad
+Preventivo
+Almacén / Calidad
+Recepción
+Registro tardío de entradas
+Desfase sistema vs físico
+Alta
+Alto
+Registro en tiempo real obligatorio
+Preventivo
+Almacén
+Inventario
+Diferencias físico vs sistema
+Pérdidas y descontrol
+Alta
+Alto
+Conteos cíclicos periódicos
+Detectivo
+Almacén
+Inventario
+Ajustes sin justificación
+Riesgo de fraude o error
+Media
+Alto
+Registro obligatorio de causa raíz
+Detectivo
+Almacén / Auditoría
+Inventario
+No detección de niveles mínimos
+Desabasto de materiales
+Media
+Alto
+Monitoreo automático de stock mínimo
+Preventivo
+Sistemas / Almacén
+Inventario
+No generación de requisiciones
+Falta de abastecimiento
+Media
+Alto
+Requisición obligatoria al detectar necesidad
+Preventivo
+Almacén
+Compras (conexión)
+Requisición incompleta
+Retrasos en compra
+Media
+Medio
+Validación de campos obligatorios en requisición
+Preventivo
+Almacén / Sistemas
+Salidas
+Entrega sin registro
+Pérdida de control
+Alta
+Alto
+Bloqueo de salida sin registro previo
+Preventivo
+Almacén
+Salidas
+Clasificación incorrecta de salida
+Falta de control operativo
+Media
+Medio
+Clasificación obligatoria de salidas
+Preventivo
+Almacén
+Salidas
+Picking incorrecto
+Entregas erróneas
+Media
+Medio
+Validación contra solicitud
+Detectivo
+Almacén
+Control
+Desalineación sistema vs físico
+Información poco confiable
+Alta
+Alto
+Validación periódica físico vs sistema
+Detectivo
+Almacén / Auditoría
+Control
+Falta de orden (5S)
+Ineficiencia operativa
+Media
+Medio
+Auditorías de orden y limpieza
+Preventivo
+Almacén
+Evaluación
+Falta de auditorías
+Problemas no detectados
+Media
+Alto
+Auditorías periódicas programadas
+Detectivo
+Auditoría
+Evaluación
+KPIs no medidos
+Falta de control del proceso
+Media
+Alto
+Seguimiento de indicadores
+Detectivo
+Dirección
+Retroalimentación
+No seguimiento a desviaciones
+Repetición de errores
+Media
+Alto
+Plan de acción y seguimiento obligatorio
+Preventivo
+Dirección
+Sistemas
+Fallo del sistema 
+Paro operativo
+Baja
+Alto
+Plan de contingencia
+Preventivo
+Sistemas
+General
+Falta de trazabilidad
+Pérdida total de control
+Alta
+Crítico
+Trazabilidad 100% obligatoria
+Preventivo
+Toda la organización
+En la sección de Diagrama de flujo, no se esta presentando así que te adjunto la imagen que debe de ir en la sección de “Gestión de almacén”
+En la sección de “Gestión de mantenimiento” por favor agrega  lo siguiente 
+En la sección “Proceso TO-BE” agregar la información que corresponde correcta en las diferentes etapas, te adjunto
+“1.- Detección del evento
+Actores que participan:
+Operador
+Sistema
+Técnico
+Encargado de mantenimiento
+Entradas:
+Checklist pre-operativo
+Medición de km / horas
+Observación en operación
+Actividades:
+El operador ejecuta checklist pre-operativo  1.2 Verifica condiciones:
+Fugas
+Presión
+Estado de mangueras
+Sistema de bombeo
+Frenos / llantas
+El sistema evalúa:
+Km vs límite preventivo
+Horas vs límite preventivo
+El operador detecta anomalías durante operación (si aplica)
+Se identifica:
+Falla
+Condición de riesgo
+Necesidad de mantenimiento preventivo
+Decisión:
+¿Existe anomalía o mantenimiento requerido?
+NO → Continúa operación
+SÍ → pasa a registro
+Resultado:
+Evento identificado
+2. Registro del evento
+Actores que participan:
+Operador / Técnico
+Auxiliar administrativo
+Sistema
+Entradas:
+Evento detectado
+Actividades:
+Se captura el evento en sistema (Herramienta digital)
+Se registra:
+ID de unidad
+Tipo de evento (preventivo / correctivo)
+Sistema afectado
+Descripción detallada
+Fecha y hora
+Usuario
+Se capturan evidencias:
+Fotografías
+Videos
+Resultado de checklist
+Se registran medidores:
+Km (odómetro)
+Horas (horómetro)
+ El sistema valida:
+Campos obligatorios
+Evidencia
+Se genera folio automático
+Reglas que se deben de respetar:
+Evento sin registro → no existe
+Evento sin evidencia → no avanza
+Uso de formatos homologados obligatorio
+Resultado:
+Evento registrado y trazable
+3. Clasificación de la falla
+Actores que participan:
+Encargado de mantenimiento
+Técnico
+Entradas:
+Evento registrado
+Actividades:
+ Evaluar condición de seguridad:
+¿Existe riesgo inmediato?
+ Evaluar cumplimiento legal:
+¿Incumple norma?
+ Evaluar capacidad técnica:
+¿Se puede diagnosticar?
+Clasificar urgencia:
+Crítico → detiene operación
+Alto → atención prioritaria
+Bajo → programable
+Estimar rango de costo:
+A / B / C / D
+Resultado (Asignación de estado):
+Disponible
+Disponible con restricción
+En mantenimiento
+Fuera de servicio
+Reglas que se deben de respetar:
+Seguridad → detención inmediata
+Legal → no operar
+Sin certeza técnica → escalar
+Resultado:
+Evento clasificado + estatus
+4. Toma de decisión 
+Actores que participan:
+Encargado de mantenimiento
+Dirección
+Finanzas
+Entradas:
+Evento clasificado
+Actividades:
+ Evaluar criterios de decisión 4.2 Definir acción:
+Ejecutar inmediato
+Programar mantenimiento
+Escalar
+Permitir operación restringida
+Reglas que se deben de respetar:
+Preventivo → obligatorio
+Riesgo → no operar
+Costos altos → aprobación
+Resultados:
+Acción definida
+5. Programación
+Actores que participan:
+Encargado de mantenimiento
+Coordinador de operaciones
+Entradas:
+Acción definida
+Actividades:
+5.1 Definir fecha de mantenimiento 
+5.2 Validar disponibilidad de unidad 
+5.3 Coordinar salida de operación 
+5.4 Asignar técnico o proveedor 
+5.5 Generar orden de mantenimiento
+Gestión de ventanas de mantenimiento:
+Supuesto:  * Mantenimiento preventivo cada 10,000 km
+Regla crítica:
+Fuera de tolerancia → detención automática
+Resultado:
+Orden programada
+6. Ejecución del mantenimiento
+Actores que participan:
+Técnico
+Proveedor
+Encargado
+Entrada:
+Orden de mantenimiento
+Actividades:
+6.1 Recepción de orden 
+6.2 Diagnóstico técnico 
+6.3 Ejecución de mantenimiento:
+Reparación
+Ajuste
+Reemplazo
+Registro en sistema:
+Actividades
+Refacciones
+Tiempo
+6.5 Captura de evidencia
+Reglas que se deben de respetar:
+Todo se registra
+Evidencia obligatoria
+Resultados:
+Mantenimiento ejecutado
+7. Validación
+Actores que participan:
+Encargado de mantenimiento
+Entradas:
+Mantenimiento ejecutado
+Actividades:
+Verificar ejecución 
+Validar seguridad 
+Validar operatividad 
+Revisar evidencia 
+Pruebas funcionales
+Regla que se debe de considerar:
+No se puede cerrar sin validación
+Resultado:
+Evento validado
+8. Cierre
+Actores que participan:
+Auxiliar
+Encargado
+Entradas:
+Evento validado
+Actividades:
+Registrar:
+Acción realizada
+Costo real
+Observaciones
+Actualizar estatus:
+Disponible / restricción
+ Cerrar evento en sistema
+Resultado:
+Evento cerrado
+9. Reporte de mejora continua
+Actores que participan:
+Encargado
+Dirección
+Actividades:
+Generar KPIs 
+Analizar fallas recurrentes 
+Realizar análisis causa raíz 
+Ajustar rutinas preventivas
+Resultado:
+Mejora del sistema
+”
+Puedes ayudarme tambien actualizando la información de Reglas de negocio ya que no se están mostrando todas, así que te adjunto la información correctas que debes de mostrar en esa sección, es la siguiente:
+“
+Generales 
+Todo evento de mantenimiento debe ser registrado en el sistema con información mínima obligatoria.  - Evento no registrado se considera inexistente.
+Todo evento debe contar con evidencia (fotográfica, checklist o documental) para poder avanzar en el flujo.
+Las decisiones del proceso deben basarse en criterios definidos (seguridad, legal, técnico, urgencia, costo), no en juicio personal.
+El sistema debe garantizar trazabilidad completa de cada evento desde su detección hasta su cierre.
+No se permite la ejecución de mantenimiento sin una orden de mantenimiento previamente generada.
+Seguridad y cumplimmiento
+Ninguna unidad puede operar si representa riesgo para la seguridad de personas o activos.
+Ninguna unidad puede operar si incumple requisitos legales o normativos aplicables.
+Si una falla compromete seguridad o cumplimiento legal, la unidad debe cambiar automáticamente a estatus:  - Fuera de servicio
+Los criterios de seguridad y cumplimiento legal prevalecen sobre cualquier consideración operativa o económica.
+”
+No en la sección de KPIs no se está mostrando correctamente la información así que te adjunto la tabla con la información completa y correcta, es lo siguiente:
+“
+Categoría
+KPI
+Cómo se calcula
+Ejemplo sencillo
+¿Qué indica?
+ Disponibilidad
+Disponibilidad de unidades (%)
+(Unidades disponibles / Total) × 100
+17 de 20 → 85%
+Qué porcentaje de unidades está listo para operar
+ Disponibilidad
+% unidades fuera de servicio
+(Fuera de servicio / Total) × 100
+3 de 20 → 15%
+Cuántas unidades están detenidas
+Eficiencia
+Tiempo de respuesta
+Hora atención - hora registro
+8:00 a 10:00 → 2 hrs
+Qué tan rápido reaccionas ante fallas
+ Eficiencia
+Tiempo de ejecución
+Hora fin - hora inicio
+10:00 a 14:00 → 4 hrs
+Qué tan rápido se resuelve el mantenimiento
+ Eficiencia
+Órdenes atendidas vs generadas (%)
+(Atendidas / Generadas) × 100
+45 de 50 → 90%
+Nivel de cumplimiento operativo
+ Preventivo
+% cumplimiento de preventivos
+(Preventivos realizados / programados) × 100
+18 de 20 → 90%
+Disciplina en mantenimiento preventivo
+ Preventivo
+% cumplimiento de ventanas
+(Preventivos en ventana / total) × 100
+16 de 20 → 80%
+Si el mantenimiento se hace a tiempo
+ Preventivo
+% preventivo vs correctivo
+(Preventivos / total eventos) × 100
+80 de 100 → 80%
+Nivel de madurez del sistema (ideal 80/20)
+Fallas
+Fallas en ruta
+Conteo mensual
+6 fallas
+Nivel de confiabilidad en operación
+Fallas
+Fallas recurrentes
+Conteo de repetición
+3 fallas repetidas
+Problemas no resueltos de raíz
+Costos
+Costo total de mantenimiento
+Suma de costos
+$120,000
+Gasto total en mantenimiento
+Costos
+Costo por unidad
+Costo total / unidades
+$120,000 / 20 = $6,000
+Eficiencia por unidad
+Costos
+Costo preventivo vs correctivo
+Comparativo
+$40k vs $80k
+Si el sistema es reactivo o preventivo
+Control
+% eventos registrados
+(Registrados / detectados) × 100
+100 de 100 → 100%
+Nivel de control del proceso
+”
+De igualmanera la información que se muestra en la sección de Roles y responsabilidades no está completa, te adjunto la tabla que debes de mostrar con la información completa:
+“
+Actor
+Rol
+Responsabilidades
+Actividades clave
+Etapas donde participa
+ Operador / Chofer
+Ejecutor en campo y primer punto de detección
+- Asegurar condiciones básicas de la unidad
+- Detectar fallas o anomalías
+- Cumplir con inspección obligatoria
+- Reportar incidencias oportunamente
+- Ejecutar checklist pre-operativo
+- Identificar fugas, daños o anomalías
+- Reportar eventos en sistema
+- Capturar evidencia básica (fotos/checklist)
+- Detener operación si aplica
+1. Detección
+2. Registro
+Técnico de mantenimiento
+Ejecutor técnico de mantenimiento
+- Ejecutar mantenimientos preventivos y correctivos
+- Diagnosticar fallas
+- Garantizar correcta ejecución técnica
+- Documentar trabajos realizados
+- Analizar fallas detectadas
+- Ejecutar mantenimiento (reparación, ajuste, reemplazo)
+- Registrar actividades, tiempos y refacciones
+- Capturar evidencia técnica
+- Reportar nuevas anomalías
+3. Clasificación (apoyo)
+6. Ejecución
+7. Validación (soporte)
+ Encargado de mantenimiento (Dueño del proceso)
+Responsable del control operativo y toma de decisiones
+- Controlar el proceso de mantenimiento
+- Clasificar eventos bajo criterios RCM
+- Definir estatus de unidades
+- Tomar decisiones operativas
+- Validar trabajos realizados
+- Asegurar cumplimiento del sistema
+- Evaluar eventos (seguridad, legal, técnico, urgencia, costo)
+- Definir acción (ejecutar, programar, escalar)
+- Programar mantenimientos
+- Supervisar ejecución
+- Validar operatividad y seguridad
+- Autorizar cierre
+- Analizar KPIs y mejora continua
+3.Clasificación
+4. Decisión
+5.Programación6. Supervisión
+7. Validación
+8. Cierre
+9. Reporte
+Auxiliar administrativo de mantenimiento
+Soporte administrativo y control documental
+- Asegurar registro completo de eventos
+- Dar seguimiento a órdenes
+- Controlar documentación y evidencia
+- Garantizar trazabilidad
+- Registrar eventos (si aplica)
+- Validar que la información esté completa
+- Dar seguimiento a órdenes abiertas
+- Registrar costos y cierre en sistema
+- Archivar evidencia
+2. Registro
+8. Cierre
+Coordinador de operaciones / Logística
+Gestión de disponibilidad operativa
+- Asegurar disponibilidad de unidades
+- Coordinar operación vs mantenimiento
+- Evitar afectación operativa
+- Validar estatus de unidades
+- Coordinar salida de unidades a mantenimiento
+- Reprogramar rutas
+- Priorizar unidades críticas para operación
+5.Programación
+Finanzas / Tesorería
+Control y autorización financiera
+- Validar costos de mantenimiento
+- Autorizar gastos fuera de rango
+- Controlar impacto financiero
+- Revisar costos estimados
+- Autorizar correctivos de alto costo
+- Validar presupuesto
+- Registrar impacto financiero
+4. Decisión (cuando aplica)
+Dirección / Gerencia
+Supervisión estratégica
+- Definir lineamientos del sistema
+- Tomar decisiones estratégicas
+- Supervisar desempeño del área
+- Aprobar decisiones críticas
+- Revisar KPIs
+- Evaluar renovación de unidades
+- Definir mejoras estratégicas
+4. Decisión (casos críticos)
+9. Reporte
+Sistema (Soft Flot / Integración)
+Soporte tecnológico y automatización
+- Automatizar el proceso
+- Asegurar trazabilidad
+- Validar reglas de negocio
+- Controlar estatus de unidades
+- Generar alertas (km / horas / ventanas)
+- Validar campos obligatorios
+- Generar folios
+- Bloquear unidades automáticamente
+- Registrar eventos
+- Controlar estatus en tiempo real
+- Generar reportes y KPIs
+1. Detección
+2. Registro
+3. Clasificación (soporte)
+5.Programación6. Ejecución
+8. Cierre
+9. Reporte
+”
+En la sección de Matriz de riesgos y control, la información esta incompleta, así que te adjunto la información que se debe de representar en la tabla con su contenido completo te adjunto la información
+“
+Riesgo
+Causa
+Impacto
+Probabilidad
+Severidad
+Controles
+Tipo de control
+Responsable
+Operación de unidad en condiciones inseguras
+No se realiza inspección o se ignoran resultados
+Accidentes, daño a activos, riesgo a personas
+Alta
+Crítica
+Inspección pre-operativa obligatoria + bloqueo automático por sistema
+Preventivo
+Operador / Sistema
+Falta de registro de eventos
+Omisión por parte del usuario o falla de control
+Pérdida de trazabilidad y control
+Media
+Alta
+Registro obligatorio + validación de campos + folio automático
+Preventivo / Detectivo
+Sistema / Auxiliar
+Eventos sin evidencia
+Falta de disciplina o herramientas
+Auditorías fallidas, decisiones incorrectas
+Media
+Alta
+Evidencia obligatoria para avanzar en flujo
+Preventivo
+Sistema / Técnico
+Clasificación incorrecta de fallas
+Falta de criterio técnico o capacitación
+Decisiones incorrectas, riesgo operativo
+Media
+Alta
+Uso de criterios RCM (seguridad, legal, técnico, urgencia, costo)
+Preventivo
+Encargado mantenimiento
+Toma de decisiones subjetiva
+Dependencia de personas
+Ineficiencia operativa
+Media
+Alta
+Reglas de negocio definidas y automatización en sistema
+Preventivo
+Encargado
+No ejecución de mantenimiento preventivo
+Falta de control o mala planificación
+Incremento de fallas y costos
+Alta
+Crítica
+Control por ventanas + alertas + detención automática fuera de tolerancia
+Preventivo
+Sistema / Encargado
+Mantenimiento fuera de tiempo (tardío)
+No respetar ventanas
+Mayor probabilidad de falla
+Alta
+Alta
+Gestión de ventanas (-20%, +10%) y bloqueo automático
+Preventivo
+Sistema
+Fallas recurrentes no atendidas
+No se analiza causa raíz
+Incremento de costos y fallas
+Media
+Alta
+KPI de recurrencia + análisis de causa raíz + ajuste preventivo
+Correctivo / Preventivo
+Encargado
+Retrasos en atención de eventos
+Mala priorización
+Afectación a operación
+Alta
+Alta
+Clasificación por urgencia + tiempos definidos
+Preventivo
+Encargado
+Ejecución incorrecta del mantenimiento
+Falta de supervisión o capacitación
+Re-trabajos, fallas posteriores
+Media
+Alta
+Validación obligatoria + checklist técnico
+Detectivo
+Encargado / Técnico
+Cierre de eventos sin validación
+Omisión del proceso
+Pérdida de control y calidad
+Media
+Alta
+Regla de no cierre sin validación en sistema
+Preventivo
+Sistema
+Baja disponibilidad de unidades
+Mala gestión de mantenimiento
+Incumplimiento operativo
+Alta
+Crítica
+KPI de disponibilidad + programación eficiente
+Preventivo
+Operaciones / Encargado
+Información inconsistente
+Falta de estandarización
+Errores en análisis y decisiones
+Media
+Media
+Homologación de formatos y validaciones en sistema
+Preventivo
+Auxiliar / Sistema
+Dependencia de personas clave
+No hay roles definidos
+Riesgo operativo alto
+Media
+Alta
+Definición de roles y responsabilidades
+Preventivo
+Dirección
+Falta de integración tecnológica
+Sistemas aislados
+Ineficiencia y duplicidad
+Media
+Media
+Evaluación e integración con Soft Flot / ERP
+Preventivo
+TI / Dirección
+No detección oportuna de mantenimiento
+Falta de automatización
+Fallas en operación
+Alta
+Alta
+Alertas automáticas por km/horas
+Preventivo
+Sistema
+Uso incorrecto de refacciones
+Falta de control o registro
+Incremento de costos
+Media
+Media
+Registro obligatorio de refacciones + validación técnica
+Detectivo
+Técnico
+Incumplimiento ambiental (residuos)
+Manejo incorrecto de residuos
+Multas, sanciones legales
+Baja
+Crítica
+Gestión con proveedores autorizados + control documental
+Preventivo
+Mantenimiento
+Sobrecarga del equipo de mantenimiento
+Mala planificación
+Retrasos en ejecución
+Media
+Media
+KPI de carga de trabajo + planeación de recursos
+Detectivo
+Encargado
+Falta de mejora continua
+No uso de KPIs
+Estancamiento del sistema
+Media
+Media
+Reportes periódicos + análisis de indicadores
+Preventivo
+Dirección
+”
+En la sección de Diagrama de flujo, no se esta presentando así que te adjunto la imagen que debe de ir en la sección de “Gestión de mantenimiento”

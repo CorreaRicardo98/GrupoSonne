@@ -1,0 +1,3846 @@
+--- PAGE 1 ---
+Grupo SONNE
+Documentación de procesos bloque 1
+Proyecto:
+Grupo Sonne
+Versión del documento:
+v1.1
+Fecha:
+11/05/2026
+Elaborado por:
+Dania Berenice Bernal Barrientos
+--- PAGE 2 ---
+Control de versiones
+Versión Fecha 1.1 11/05/1993 Descripción Versión inicial
+de
+documentación
+de procesos
+bloque 1
+Elaboró Dania Bernal
+Aprobó
+--- PAGE 3 ---
+Contenido
+Control de versiones ........................................................................................................................ 1
+Introducción ..................................................................................................................................... 3
+Proceso Gestión de pagos ................................................................................................................ 4
+Objetivo del proceso .................................................................................................................... 4
+Alcance ......................................................................................................................................... 4
+Proceso gestión de pagos to-be ................................................................................................... 4
+Validación Operativa (Antes de cada extracción) .................................................................... 4
+1. Extracción de datos desde MUTA ........................................................................................ 4
+2. Validación operativa (Filtro de registros) ............................................................................. 5
+3. Consolidación de información .............................................................................................. 5
+4. Cálculo de pagos ................................................................................................................... 6
+5. Generación de Orden de Pago ............................................................................................. 6
+6. Facturación (Cliente) ............................................................................................................ 7
+7. Recepción y validación de factura ........................................................................................ 7
+8. Aprobación financiera .......................................................................................................... 7
+9. Ejecución del pago................................................................................................................ 8
+10. Notificación al cliente ......................................................................................................... 8
+11. Registro y conciliación ........................................................................................................ 9
+Subproceso relacionado “Gestión de Penalizaciones” ............................................................ 9
+Subproceso Relacionado “Soporte TI” ................................................................................... 10
+Reglas de negocio ....................................................................................................................... 10
+Validación de información ..................................................................................................... 10
+Cálculo de pagos..................................................................................................................... 11
+Reglas financieras ................................................................................................................... 11
+Facturación ............................................................................................................................. 11
+Operación y control ................................................................................................................ 11
+KPI´S del proceso gestión de pagos ............................................................................................ 12
+Roles y responsabilidades .......................................................................................................... 13
+Proceso gestión de compras .......................................................................................................... 15
+Objetivo del proceso .................................................................................................................. 15
+Alcance ....................................................................................................................................... 15
+--- PAGE 4 ---
+Proceso gestión de compras to be ............................................................................................. 15
+1.- Detección de necesidad .................................................................................................... 15
+2.- Creación de Solicitud de Compra (SC)............................................................................... 15
+3.- Validación Presupuestal .................................................................................................... 16
+4.- Flujo de Aprobación .......................................................................................................... 16
+5.-Proceso de Cotización ........................................................................................................ 17
+6.-Selección de Proveedor ..................................................................................................... 17
+7.- Generación de Orden de Compra (OC) ............................................................................. 17
+8.-Recepción de Bienes/Servicios .......................................................................................... 18
+9.-Validación de Factura ......................................................................................................... 18
+10.- Ejecución de Pago ........................................................................................................... 18
+Reglas de negocio ....................................................................................................................... 19
+KPI´s proceso gestión de compras ............................................................................................. 19
+Roles y responsabilidades .......................................................................................................... 21
+Proceso Gestión de Almacén ......................................................................................................... 23
+Objetivo del proceso .................................................................................................................. 23
+Alcance ....................................................................................................................................... 23
+Proceso gestión de almacén to-be ............................................................................................. 23
+1.- Planeación de Inventarios ................................................................................................. 23
+2.- Organización del Almacén................................................................................................. 24
+3.- Recepción de Materiales ................................................................................................... 24
+4.- Control de Inventario ........................................................................................................ 25
+5.- Control de Salidas ............................................................................................................. 26
+6.- Control y Orden del Almacén ............................................................................................ 26
+7.- Evaluación y Auditoría ...................................................................................................... 27
+8.- Retroalimentación y Mejora Continua ............................................................................. 27
+Reglas de negocio ....................................................................................................................... 28
+KPI´s proceso gestión de almacén .............................................................................................. 29
+Roles y responsabilidades .......................................................................................................... 30
+Proceso gestión de mantenimiento ............................................................................................... 31
+Objetivo del proceso .................................................................................................................. 32
+Alcance ....................................................................................................................................... 32
+--- PAGE 5 ---
+Proceso gestión de mantenimiento to-be ................................................................................. 32
+1.- Detección del evento ........................................................................................................ 32
+2. Registro del evento ............................................................................................................ 33
+3. Clasificación de la falla ....................................................................................................... 34
+4. Toma de decisión ............................................................................................................... 35
+5. Programación ..................................................................................................................... 35
+7. Validación ........................................................................................................................... 38
+8. Cierre .................................................................................................................................. 39
+Reglas de negocio ....................................................................................................................... 40
+KPI´s proceso de mantenimiento ............................................................................................... 41
+Roles y responsabilidades .......................................................................................................... 42
+--- PAGE 6 ---
+Introducción
+Los procesos TO-BE de gestión de mantenimiento, almacén, compras y pagos establecen
+un modelo operativo estandarizado, orientado a mejorar la eficiencia, el control y la
+trazabilidad en las operaciones. Estos procesos integran las distintas áreas del negocio
+mediante flujos definidos y reglas claras, permitiendo una mejor toma de decisiones,
+optimización de recursos y alineación entre la operación y la gestión administrativa y
+financiera.
+Proceso Gestión de pagos
+El proceso de Gestión de Pagos TO-BE establece un flujo estructurado para validar,
+calcular y ejecutar pagos de forma eficiente y controlada, utilizando información confiable
+de la operación y cumpliendo con reglas de negocio y validaciones financieras.
+Objetivo del proceso
+Garantizar que los pagos a proveedores (generadores) se realicen de forma correcta,
+trazable, oportuna y controlada, utilizando información confiable proveniente de MUTA,
+alineada a reglas financieras y validaciones administrativas.
+Alcance
+Desde la extracción de datos en MUTA hasta la ejecución del pago y conciliación contable,
+incluyendo validación, consolidación, cálculo, orden de pago, facturación, aprobación y
+control.
+Proceso gestión de pagos to-be
+Validación Operativa (Antes de cada extracción)
+Actor: Logística y Recolección
+Actividades:
+Validar en campo:
+• Registro de recolección
+• Kilos capturados
+• Evidencias (foto, firma, nombre)
+• Dirección correcta
+Consideraciones:
+• Las evidencias son obligatorias en MUTA (candado operativo)
+--- PAGE 7 ---
+1. Extracción de datos desde MUTA
+Actor: Administración
+Actividades:
+• Descarga de reporte de recolecciones desde MUTA:
+o Código interno generador
+o Fecha de recolección
+o Estado
+o Dirección
+o Metodo de pago*
+o Tags Generador
+o Id legal Generador = RFC*
+o Kilos (netos/brutos)
+o Precio
+Resultado:
+• Dataset base de recolecciones
+2. Validación operativa (Filtro de registros)
+Actor: Administración
+Actividades:
+• Filtrar registros con estado válido para pago:
+o Completado
+o Verificado
+• Validar:
+o Integridad de datos (RFC, kilos, precio)
+o No duplicidad de registros
+️ Consideraciones:
+• Las inconsistencias no bloquean el pago, pero deben registrarse como
+incidencias, darles seguimiento y corregirse en un flujo paralelo. Solo aquellas
+que afecten directamente el monto (kilos o precio) deberán resolverse antes del
+cálculo.
+Resultado:
+--- PAGE 8 ---
+• Registros válidos para procesamiento de pago
+3. Consolidación de información
+Actor: Administración
+Actividades:
+• Agrupar información por:
+•
+o Cliente
+o Periodo (día / semana / quincena)
+• Aplicar reglas:
+o Monto mínimo ($500)
+o Exclusión de registros inválidos
+Resultado:
+• Base consolidada por cliente y periodo
+4. Cálculo de pagos
+Actor: Administración
+Actividades:
+• Calcular monto por cliente:
+o Kilos x Precio (según contrato)
+• Validar:
+o Consistencia de kilos (MUTA vs sistema actual)
+• Herramientas de validación IA (Prompt)
+o Precio vigente
+Exclusiones:
+Resultado:
+• Penalizaciones (se gestionan en subproceso independiente)
+• Monto total a pagar por cliente
+--- PAGE 9 ---
+5. Generación de Orden de Pago
+Actor: Administración
+Actividades:
+• Generar documento orden de pago estándar que incluye:
+o Cliente
+o Periodo
+o Kilos
+o Monto total
+o Referencia de recolecciones
+• Enviar orden de pago al cliente
+• Solicita factura
+Resultados:
+• Orden de pago enviada
+6. Facturación (Cliente)
+Actor: Cliente
+Actividades:
+• Recibir orden de pago
+• Emitir factura
+• Enviar factura
+Resultado: Factura emitida y enviada por el cliente, alineada con la orden de pago
+generada
+7. Recepción y validación de factura
+Actor: Administración
+Actividades:
+• Recepción de factura por parte del cliente
+• Validación de:
+o RFC correcto
+o Monto coincidente
+o Datos fiscales completos
+Regla crítica:
+--- PAGE 10 ---
+• Sin factura → NO se procesa el pago
+• Factura incorrecta → rechazo
+• Factura válida → continuar con el proceso
+Resultado:
+• Factura validada y autorizada
+8. Aprobación financiera
+Actor: Administración / Tesorería
+Actividades:
+• Nivel 1: Administración
+o Validación final de:
+▪ Cálculo
+▪ Orden de pago
+▪ Factura
+• Nivel 2: Tesorería
+o Validación de:
+▪ Disponibilidad de fondos
+Decisión:
+• Rechazado → Corrección / Aplazamiento: El pago puede ser rechazado por
+errores en cálculo, factura o información, en cuyo caso se corrige y revalida.
+También puede aplazarse por causas operativas como falta de fondos o factura
+pendiente, sin reiniciar el proceso.
+• Aprobado → ejecución
+Resultado:
+• Pago autorizado
+9. Ejecución del pago
+Actor: Tesorería
+Actividades:
+--- PAGE 11 ---
+• Realizar transferencia (SPEI / bancaria)
+• Registrar:
+o Referencia bancaria
+o Fecha de pago
+o Monto pagado
+Resultado:
+• Pago ejecutado
+10. Notificación al cliente
+Actor: Administración
+Actividades:
+• Enviar confirmación de pago:
+o Comprobante
+o Detalle del pago
+Resultado:
+• Cliente notificado
+11. Registro y conciliación
+Actor: Administración / Finanzas
+Actividades:
+• Registro contable del pago
+• Conciliación bancaria
+• Cierre del periodo
+Resultado:
+• Proceso cerrado y conciliado
+Subproceso relacionado “Gestión de Penalizaciones”
+• Se gestiona fuera del flujo principal
+• No bloquea pagos
+• Puede afectar ajustes posteriores o compensaciones
+• Penalizaciones a Clientes se aplican cuando el cliente incumple condiciones
+acordadas, por ejemplo:
+--- PAGE 12 ---
+o Entrega de material fuera de especificación (contaminación, mezcla
+indebida)
+o Diferencias relevantes entre volumen reportado vs recibido
+o Incumplimiento de condiciones logísticas (accesos, tiempos, preparación)
+o Visitas en cero
+o Retrasos en servicio
+o Falta de cumplimiento en procesos administrativos (ej. retraso en
+facturación, si se decide aplicar)
+▪ Impacto:
+• Ajuste en el monto a pagar (reducción)
+• Registro como incidencia contractual
+• Penalizaciones a Proveedores, se aplican cuando la operación interna o
+proveedores incumplen estándares definidos, por ejemplos:
+o Registro incorrecto de datos (kilos, dirección, cliente)
+o Retrasos operativos
+▪ Impacto:
+• Puede generar:
+o Ajustes internos
+o Evaluación de desempeño
+o Penalización económica interna (si aplica)
+Subproceso Relacionado “Soporte TI”
+• Soporte a incidencias operativas, se atienden problemas relacionados con el uso
+del sistema en la operación diaria, por ejemplo:
+o Error en la descarga de reportes de MUTA
+o Fallas en accesos o permisos de usuarios
+o Problemas en visualización de información (precios, kilos, estados)
+• Soporte a calidad de datos, se enfoca en la corrección y validación de
+información utilizada en pagos, por ejemplo:
+o Corrección de direcciones incorrectas
+o Ajustes en registros duplicados
+• Soporte evolutivo (mejoras al sistema), se enfoca en la evolución del sistema
+para mejorar el proceso, por ejemplo:
+o Incorporación de nuevos campos requeridos
+--- PAGE 13 ---
+o Ajustes en reportes de MUTA
+Reglas de negocio
+Validación de información
+• Integridad de datos obligatoria, todo registro de recolección debe contar con:
+o RFC del cliente
+o Kilos
+o Precio
+o Estado válido
+• Estados válidos para pago, solo se procesan registros con estado:
+o Verificado
+• No se permiten procesar registros duplicados:
+o Variables:
+▪ ID_Recolección
+▪ Fecha_Recolección
+▪ Cliente
+o Clave única sugerida:
+ID_Recolección + Fecha_Recolección + Cliente
+• MUTA es la única fuente de datos operativos para el pago.
+• Manejo de inconsistencias, las inconsistencias:
+o No bloquean el flujo
+o Se registran como incidencias
+o Excepción:
+Si afectan el monto (kilos o precio) → deben corregirse antes del cálculo
+Cálculo de pagos
+• La base para el cálculo es sobre los Kilos Netos
+• El monto se calcula de la siguiente manera:
+• Fórmula:
+Monto_Pago = Kilos_Netos × Precio_Contrato
+--- PAGE 14 ---
+• El precio por kilo debe estar definido en el contrato y debe de coincidir con el
+registro en MUTA.
+• Las penalizaciones no afectan el cálculo inicial y se gestionan en un subproceso
+independiente llamado “Gestión de Penalizaciones”
+Reglas financieras
+• Pagos menores a $500 no se procesan y se acumulan.
+Regla:
+o Si Monto_Pago < Monto_Mínimo → se acumula
+o Si Monto_Pago ≥ Monto_Mínimo → se paga
+• Los pagos solo se ejecutan en periodos definidos:
+o Principios de mes
+o Finales de mes
+• Todo pago debe contar con un folio único.
+Facturación
+• No se puede ejecutar un pago sin factura válida.
+• La factura debe pasar por una validación fiscal considerando las siguientes
+variables:
+o RFC_Factura
+o Monto_Factura
+o Datos_Fiscales
+o Debe cumplir:
+▪ RFC correcto
+▪ Monto coincide con orden
+▪ Datos completos
+--- PAGE 15 ---
+• El monto de la factura debe coincidir con la orden de pago.
+Regla:
+Monto_Factura = Monto_Orden_Pago
+Operación y control
+• Las evidencias son obligatorias en MUTA, pero no bloquean el pago:
+o Foto
+o Firma
+o Nombre
+• Las inconsistencias deben registrarse, clasificarse y tener seguimiento, pero sin
+detener el proceso.
+• Todo cambio en datos (precio, kilos, cliente) debe quedar registrado en un
+historial
+• Debe existir separación de funciones entre validación (Administración) y
+ejecución (Tesorería).
+• Todo pago debe quedar registrado en el sistema, incluyendo su estado:
+realizado, pendiente o acumulado para periodos posteriores.
+• No se puede ejecutar un pago si no se cumple:
+o Validación → Cálculo → Factura → Aprobación
+Reglas de penalizaciones
+• Las penalizaciones se establecen en contrato y pueden ser aplicables
+considerando los siguientes pasos:
+o Visitas en cero
+o Retrasos en servicio
+o Incumplimientos operativos
+--- PAGE 16 ---
+KPI´S del proceso gestión de pagos
+KPI ¿Qué mide? Fórmula Ejemplo Interpretación
+Tiempo total
+de ciclo de
+pago
+Tiempo desde
+extracción hasta
+pago
+Fecha pago – Fecha
+extracción
+1 mayo →
+5 mayo = 4
+días
+Menor tiempo =
+mayor eficiencia
+Tiempo de
+espera de
+factura
+Tiempo que tarda
+el cliente en
+enviar factura
+Fecha factura – Fecha
+orden
+2 mayo →
+6 mayo = 4
+días
+Alto = retraso
+del cliente
+% de pagos en
+tiempo
+Cumplimiento de
+fechas de pago
+(Pagos en tiempo /
+Total) × 100
+60/80 =
+75%
+<80% indica
+problemas
+% de pagos
+con errores
+Pagos con
+inconsistencias o
+correcciones
+(Pagos con error /
+Total) × 100
+10/100 =
+10%
+Ideal <5%
+Monto total
+pagado
+Total de dinero
+pagado por
+periodo
+Σ pagos $1,200,000 Control
+financiero
+Costo por kilo Costo promedio
+por kilo
+recolectado
+Total pagado / Total
+kilos
+$1M / 200k
+kg = $5/kg
+Base para
+margen
+% registros
+con
+inconsistencias
+Calidad de datos
+en MUTA
+(Registros con error /
+Total) × 100
+50/500 =
+10%
+Alto = problema
+operativo
+% facturas a
+tiempo
+Cumplimiento del
+cliente
+(Facturas a tiempo /
+Total) × 100
+70/100 =
+70%
+Bajo = retrasos
+externos
+Monto
+acumulado
+(<$500)
+Dinero retenido
+por regla de
+mínimo
+Σ pagos menores a
+$500
+$15,000 Alto = muchos
+pagos pequeños
+% pagos sin
+factura
+Control fiscal (Pagos sin factura /
+Total) × 100
+0%
+esperado
+Debe ser 0%
+% pagos
+conciliados
+Pagos correctos vs
+banco
+(Pagos conciliados /
+Total) × 100
+98/100 =
+98%
+Cercano a 100%
+--- PAGE 17 ---
+Roles y responsabilidades
+Rol / Actor Responsabilidad Actividades clave Logística y
+Recolección
+Validar la
+información
+operativa en
+campo
+- Registrar recolecciones en
+MUTA
+- Capturar kilos (netos/brutos)
+- Adjuntar evidencias (foto,
+firma, nombre)
+- Validar dirección y ejecución
+del servicio
+- Detectar incidencias (visitas
+en cero, retrasos)
+Administración
+(Back Office /
+Pagos)
+Gestionar el
+proceso
+completo de
+pagos (rol core)
+- Descargar datos de MUTA
+- Validar información (RFC,
+kilos, precio, estado) - Eliminar
+duplicados
+- Registrar incidencias
+- Consolidar información por
+cliente/periodo
+- Aplicar reglas (mínimo $500) -
+Calcular pagos (kilos netos ×
+precio)
+- Generar orden de pago
+- Enviar orden y solicitar
+factura - Validar factura
+- Gestionar correcciones
+- Notificar al cliente
+Cliente
+(Generador)
+Emitir factura y
+recibir pago
+- Recibir orden de pago
+- Generar factura
+- Enviar factura a Sonne
+- Atender correcciones si aplica
+- Confirmar recepción del pago
+Tesorería Validar y ejecutar
+el pago
+- Validar disponibilidad de
+fondos
+- Aprobar pago (nivel 2)
+Etapas donde
+participa
+0. Validación
+operativa
+1. Extracción
+2. Validación
+administrativa
+3. Consolidación
+4. Cálculo
+5. Orden de pago
+7. Validación de
+factura
+8. Aprobación (Nivel
+1)
+9. Notificación
+6. Facturación
+7. Corrección de
+factura
+9. Recepción de
+notificación
+8. Aprobación (Nivel
+2)
+--- PAGE 18 ---
+Contabilidad /
+Finanzas
+(Soporte TI) Administración
+(Control /
+Auditoría
+interna) (puede
+ser el mismo rol
+inicialmente)
+Registrar y
+conciliar los
+pagos
+Garantizar
+disponibilidad,
+calidad de datos y
+soporte técnico
+Control y
+trazabilidad del
+proceso
+- Ejecutar transferencia
+bancaria
+- Registrar referencia de pago
+- Reprogramar pagos si no hay
+fondos
+- Registrar pago en sistema
+contable
+- Conciliar contra banco
+- Validar cierre de periodo
+- Generar reportes financieros
+- Soporte a incidencias en
+MUTA
+- Validar y corregir datos (kilos,
+direcciones, precios)
+- Ajustar reportes o campos
+- Soporte en automatización
+(IA, integraciones)
+- Mantener trazabilidad de
+cambios
+- Mantener bitácora de pagos
+(realizados / pendientes)
+- Mantener bitácora de
+cambios (precios, kilos,
+clientes)
+- Validar cumplimiento de
+reglas
+- Seguimiento a incidencias
+9. Ejecución del
+pago
+10. Registro y
+conciliación
+Transversal (todas
+las etapas)
+Transversal (control
+del proceso)
+--- PAGE 19 ---
+Matriz de riesgos y control
+Riesgo Descripci
+Causa
+Imp
+ón
+raíz
+acto
+Pago
+incorrec
+to
+Se paga
+un monto
+erróneo al
+cliente
+Error en
+cálculo
+o datos
+inconsis
+tentes
+Alto Pago sin
+factura
+Se ejecuta
+pago sin
+respaldo
+fiscal
+Omisió
+n en
+validaci
+ón
+Alto Pro
+b.
+Me
+dia
+Baj
+a
+Niv
+el
+Alt
+o
+Alt
+o
+Control(
+es)
+Validació
+n de
+cálculo
+(kilos
+netos ×
+precio),
+revisión
+en
+aprobaci
+ón Nivel
+1
+Regla:
+pago no
+procede
+sin
+factura
+válida
+Tipo
+de
+contr
+ol
+Preve
+ntivo
+/
+Detec
+tivo
+Preve
+ntivo
+Etapa Cálculo
+/
+Aprobac
+ión
+Validaci
+ón de
+factura
+Respons
+able
+Adminis
+tración
+Adminis
+tración
+--- PAGE 20 ---
+Duplicid
+ad de
+pago
+Datos
+inconsis
+tentes
+Error en
+kilos
+(netos)
+Falta de
+evidenci
+as
+Pago
+fuera de
+periodo
+Pago sin
+aprobac
+ión
+Falta de
+fondos
+Se paga
+más de
+una vez la
+misma
+recolecció
+n
+Datos
+erróneos
+(kilos,
+precio,
+cliente)
+Uso
+incorrecto
+de kilos
+netos
+afecta
+pago
+Recolecci
+ón sin
+respaldo
+visual
+Pago
+fuera de
+fechas
+definidas
+Se ejecuta
+pago sin
+validación
+interna
+No hay
+liquidez
+para
+ejecutar
+pagos
+Falta de
+control
+de
+duplica
+dos
+Error en
+captura
+o
+sistema
+Falta de
+control
+o
+medició
+n
+Falta de
+control
+en
+campo
+Falta de
+control
+de
+periodo
+s
+Falta de
+control
+de flujo
+Mala
+planeac
+ión
+financie
+ra
+Alto Med
+io
+Alto Med
+io
+Med
+io
+Alto Alto Me
+dia
+Alt
+a
+Me
+dia
+Me
+dia
+Me
+dia
+Baj
+a
+Me
+dia
+Alt
+o
+Alt
+o
+Alt
+o
+Me
+dio
+Me
+dio
+Alt
+o
+Alt
+o
+Validació
+n de
+duplicida
+d (ID +
+fecha +
+cliente)
+Registro
+de
+incidenci
+as +
+validació
+n previa
+al
+cálculo
+Validació
+n
+cruzada
+MUTA vs
+control
+interno
+Candado
+en
+MUTA
+(evidenci
+as
+obligator
+ias)
+Validació
+n de
+periodo
+antes de
+aprobaci
+ón
+Aprobaci
+ón en 2
+niveles
+(Adminis
+tración /
+Tesorerí
+a)
+Validació
+n de
+disponibi
+lidad en
+Tesorerí
+a
+Preve
+ntivo
+Detec
+tivo
+Detec
+tivo
+Preve
+ntivo
+Preve
+ntivo
+Preve
+ntivo
+Preve
+ntivo
+Validaci
+ón
+adminis
+trativa
+Validaci
+ón
+adminis
+trativa
+Cálculo Validaci
+ón
+operativ
+a
+Consoli
+dación /
+Aprobac
+ión
+Aprobac
+ión
+Aprobac
+ión
+Nivel 2
+Adminis
+tración
+Adminis
+tración
+Adminis
+tración
+Logística
+Adminis
+tración
+Adminis
+tración /
+Tesorerí
+a
+Tesorerí
+a
+--- PAGE 21 ---
+Retraso
+en
+facturac
+ión
+Factura
+incorrec
+ta
+Datos
+bancari
+os
+incorrec
+tos
+Incidenc
+ias no
+atendid
+as
+Penaliza
+ciones
+mal
+aplicada
+s
+Visitas
+en cero
+no
+controla
+das
+Error en
+concilia
+ción
+Cliente no
+envía
+factura a
+tiempo
+Factura
+con
+errores
+fiscales
+Transfere
+ncia a
+cuenta
+errónea
+Errores no
+corregido
+s
+Ajustes
+incorrecto
+s al
+cliente/pr
+oveedor
+Costos
+logísticos
+sin
+control
+Diferencia
+s con
+banco
+Depend
+encia
+externa
+Error
+del
+cliente
+Falta de
+control
+de
+datos
+bancari
+os
+Falta de
+seguimi
+ento
+Falta de
+reglas
+claras
+Falta de
+registro
+Registro
+incorrec
+to
+Med
+io
+Med
+io
+Alto Med
+io
+Med
+io
+Med
+io
+Med
+io
+Alt
+a
+Me
+dia
+Me
+dia
+Me
+dia
+Me
+dia
+Me
+dia
+Me
+dia
+Alt
+o
+Me
+dio
+Alt
+o
+Me
+dio
+Me
+dio
+Me
+dio
+Me
+dio
+Seguimie
+nto a
+cliente +
+control
+de
+tiempos
+Validació
+n de
+factura
+(RFC,
+monto,
+datos)
+Validació
+n en
+fuente
+externa
+(Excel
+controla
+do)
+Registro
+y
+seguimie
+nto de
+incidenci
+as
+Definició
+n
+contract
+ual +
+validació
+n previa
+Registro
+de
+incidenci
+as +
+control
+contract
+ual
+Conciliac
+ión
+bancaria
+obligator
+ia
+Detec
+tivo
+Detec
+tivo
+Preve
+ntivo
+Detec
+tivo
+Preve
+ntivo
+Detec
+tivo
+Detec
+tivo
+Factura
+ción
+Validaci
+ón de
+factura
+Ejecució
+n del
+pago
+Validaci
+ón
+adminis
+trativa
+Subproc
+eso
+penaliza
+ciones
+Operaci
+ón /
+Penaliza
+ciones
+Concilia
+ción
+Adminis
+tración
+Adminis
+tración
+Tesorerí
+a
+Adminis
+tración
+Adminis
+tración
+Logística
+/
+Adminis
+tración
+Finanzas
+--- PAGE 22 ---
+Diagrama de flujo gestión de pagos to-be
+Link de diagrama para consulta:
+https://miro.com/app/board/uXjVHYBgbLA=/?share_link_id=875147726717
+Pasar a Figma
+--- PAGE 23 ---
+Proceso gestión de compras
+El proceso de Gestión de Pagos TO-BE establece un flujo estructurado para validar,
+calcular y ejecutar pagos de forma eficiente y controlada, utilizando información confiable
+de la operación y cumpliendo con reglas de negocio y validaciones financieras.
+Objetivo del proceso
+Optimizar el proceso de compras mediante automatización, control presupuestal y
+trazabilidad en tiempo real, garantizando eficiencia operativa, reducción de costos y
+cumplimiento normativo.
+Alcance
+El proceso de Gestión de Compras abarca desde la identificación de la necesidad hasta el
+pago al proveedor y la evaluación de su desempeño, incluyendo la solicitud de compra,
+validación presupuestal, aprobaciones, cotización, selección de proveedor, generación de
+orden de compra, recepción de bienes o servicios, validación documental y ejecución de
+pago. El proceso se ejecuta de forma digital, con controles financieros, trazabilidad
+completa y separación de funciones entre Finanzas, Compras y Tesorería.
+Proceso gestión de compras to be
+1.- Detección de necesidad
+Actor: Solicitante / Sistema
+• La necesidad puede originarse por:
+o Requerimiento operativo (usuario)
+o Stock mínimo (inventario)
+o Mantenimiento programado (operaciones / MUTA)
+• El sistema puede sugerir:
+o Proveedores frecuentes
+o Precios históricos
+o Tiempos de entrega
+Resultado
+• Requerimiento identificado y listo para formalización
+--- PAGE 24 ---
+2.- Creación de Solicitud de Compra (SC)
+Actor: Solicitante
+• Captura en sistema con campos obligatorios:
+o Tipo de compra (operativa, CAPEX, mantenimiento)
+o Centro de costo
+o Cantidad y descripción
+o Fecha requerida
+o Justificación del requerimiento
+• Validaciones automáticas:
+o Catálogo de productos/servicios
+o Campos obligatorios completos
+Resultado:
+• Solicitud de Compra registrada (estatus: “Pendiente validación”)
+3.- Validación Presupuestal
+Actor: Finanzas
+• Validación de:
+o Disponibilidad presupuestal
+o Partida contable
+o Centro de costo
+• Posibles escenarios:
+o Aprobado → se asigna presupuesto
+o Rechazado → regresa a solicitante
+o Ajuste → modificación de monto o alcance
+Resultado:
+• SC aprobada con presupuesto asignado
+4.- Flujo de Aprobación
+Actor: Sistema + Aprobador
+• Flujo automático basado en:
+o Monto de compra
+o Tipo de compra
+o Área
+• Niveles de aprobación configurables:
+--- PAGE 25 ---
+o Jefe directo
+o Gerencia
+o Dirección
+• Notificaciones automáticas
+Resultado:
+• SC aprobada / rechazada
+5.-Proceso de Cotización
+Actor: Compras
+• Envío de solicitudes de cotización a proveedores
+• Recepción de propuestas en sistema
+• Comparación automática:
+o Precio
+o Tiempo de entrega
+o Condiciones comerciales
+o Score histórico del proveedo
+Resultado:
+• Cuadro comparativo de cotizaciones
+6.-Selección de Proveedor
+Actor: Compras
+• Análisis de propuestas
+• Selección del proveedor óptimo (costo-beneficio)
+• Regla clave:
+o Si no se selecciona la mejor opción → justificar en sistema
+• Registro de decisión
+Resultado:
+• Proveedor seleccionado
+7.- Generación de Orden de Compra (OC)
+Actor: Sistema + Compras
+• Generación automática de OC basada en SC aprobada
+--- PAGE 26 ---
+• Inclusión de:
+o Datos del proveedor
+o Condiciones de pago
+o Fecha de entrega
+• Envío automático al proveedor
+Resultado:
+• OC emitida y enviada
+8.-Recepción de Bienes/Servicios
+Actor: Almacén / Operaciones
+• Recepción física o validación del servicio
+• Comparación contra OC:
+o Cantidad
+o Calidad
+• Registro de evidencia:
+o Fotos
+o Firma
+o Documentos
+• Manejo de incidencias:
+o Rechazo parcial o total
+Resultado:
+• Recepción registrada (Aceptada / Rechazada)
+9.-Validación de Factura
+Actor: Sistema + Compras
+• Validación automática:
+o Orden de compra (OC)
+o Recepción
+o Factura
+• Escenarios:
+o Coincide → pasa a pago
+o No coincide → bloqueo + incidencia
+• Resultado:
+o Factura validada
+--- PAGE 27 ---
+10.- Ejecución de Pago
+Actor: Tesorería
+• Programación de pago según:
+o Condiciones acordadas
+o Flujo de caja
+• Ejecución del pago
+• Registro en sistema
+• Notificación al proveedo
+Resultado:
+o Pago realizado
+Reglas de negocio
+• No existe OC sin SC aprobada
+• Toda solicitud debe contar con validación de presupuesto (Finanzas)
+• El sistema verifica disponibilidad antes de aprobar
+• Si excede el presupuesto:
+o Se bloquea el flujo
+o Se notifica al responsable
+o Se requiere autorización o rechazo
+• Toda excepción debe incluir justificación
+• Se registra en bitácora:
+o Validación realizada
+o Excepciones autorizadas o rechazadas
+o Usuario, fecha y motivo
+• La SC no podrá ser creada si faltan campos requeridos.
+o Variables:
+▪ tipo_compra (Operativa, Mantenimiento, ertc)
+▪ centro_costo
+▪ descripcion
+▪ cantidad
+▪ fecha_requerida
+▪ justificacion
+--- PAGE 28 ---
+• Mínimo 2 cotizaciones (salvo excepción)
+• Justificación obligatoria en decisiones de compra
+• No se ejecuta pago sin:
+o OC válida
+o Recepción validada
+o Factura correcta
+• Al seleccionar al proveedor, se debe evaluar la mejor opción costo-beneficio.
+o Variables:
+▪ precio
+▪ tiempo_entrega
+▪ score_proveedor
+• Si no se elige la mejor opción, se debe justificar.
+--- PAGE 29 ---
+KPI´s proceso gestión de compras
+Categoría KPI ¿Qué mide? Eficiencia del
+proceso
+Tiempo total
+de compra
+Tiempo de
+inicio a fin del
+proceso
+Eficiencia del
+proceso
+Tiempo de
+aprobación
+Tiempo en
+aprobar SC
+Eficiencia del
+proceso
+Tiempo
+generación OC
+Tiempo en
+emitir orden de
+compra
+Eficiencia del
+proceso
+Tiempo de
+pago
+Tiempo en
+pagar tras
+validación
+Control del
+dinero
+% compras
+dentro de
+presupuesto
+Cumplimiento
+del
+presupuesto
+Control del
+dinero
+% desviación
+presupuestal
+Exceso de gasto Control del
+dinero
+Ahorro en
+compras
+Ahorro logrado Control del
+dinero
+% compras con
+excepción
+Compras fuera
+de estándar
+Gestión de
+compras
+% compras con
+RFQ
+Uso de
+cotizaciones
+Gestión de
+compras
+Tiempo
+selección
+proveedor
+Tiempo en
+elegir
+proveedor
+Gestión de
+compras
+%
+cumplimiento
+proceso
+Uso correcto
+del flujo
+Entregas y
+operación
+% entregas a
+tiempo
+Cumplimiento
+proveedor
+Entregas y
+operación
+% entregas sin
+error
+Calidad de
+entrega
+Entregas y
+operación
+% incidencias Problemas en
+recepción
+Fórmula Fecha pago –
+Fecha solicitud
+Fecha aprobación
+– Fecha solicitud
+Fecha OC – Fecha
+aprobación
+Fecha pago –
+Fecha factura
+validada
+(Compras dentro /
+total) ×100
+(Gasto real –
+presupuesto) /
+presupuesto ×100
+(Precio estimado –
+real) / estimado
+×100
+(Compras
+excepción / total)
+×100
+(Compras con RFQ
+/ total) ×100
+Fecha selección –
+fecha cotización
+(Compras
+correctas / total)
+×100
+(Entregas a tiempo
+/ total) ×100
+(Entregas
+correctas / total)
+×100
+(Recepciones con
+error / total) ×100
+Interpretación
+Menor tiempo =
+mayor eficiencia
+Alto = cuellos de
+botella
+Mide eficiencia
+de Compras
+Impacta relación
+con proveedor
+Alto = buen
+control
+financiero
+Alto =
+sobrecostos
+Alto = buena
+negociación
+Alto = riesgo de
+malas decisiones
+Alto = mayor
+control
+Bajo = eficiencia
+Bajo = riesgo de
+auditoría
+Bajo =
+proveedor
+deficiente
+Bajo =
+problemas
+operativos
+Alto = fallas
+operativas
+--- PAGE 30 ---
+Pagos
+(Tesorería)
+Pagos
+(Tesorería)
+Pagos
+(Tesorería)
+Control y
+cumplimiento
+Control y
+cumplimiento
+Control y
+cumplimiento
+Proveedores Proveedores Operación Operación % pagos a
+tiempo
+Tiempo
+promedio de
+pago
+% pagos con
+error
+% compras
+fuera del
+proceso
+% compras
+urgentes
+%
+cumplimiento
+Calificación de
+proveedores
+% proveedores
+evaluados
+Indicador de
+compras
+(volumen)
+Tiempo por
+solicitud
+Cumplimiento
+de pago
+Tiempo
+promedio para
+pagar
+Pagos
+incorrectos
+Compras no
+controladas
+Nivel de
+planeación
+Validación
+correcta
+Desempeño
+general
+Nivel de control Número de
+compras
+Tiempo
+promedio por
+SC
+(Pagos a tiempo /
+total) ×100
+Promedio (Fecha
+pago – factura)
+(Pagos con error /
+total) ×100
+(Compras fuera /
+total) ×100
+(Compras
+urgentes / total)
+×100
+(Pagos validados /
+total) ×100
+Promedio (calidad
++ tiempo +
+cumplimiento)
+(Evaluados / total)
+×100
+Total SC/OC en
+periodo
+Promedio (Fecha
+fin – inicio)
+Alto = buena
+tesorería
+Bajo = buena
+liquidez
+Alto = riesgo
+financiero
+Alto = riesgo de
+fraude
+Alto = mala
+planeación
+Bajo = riesgo de
+pago indebido
+Bajo =
+proveedor
+riesgoso
+Bajo = falta de
+seguimiento
+Mide carga
+operativa
+Mide eficiencia
+por caso
+--- PAGE 31 ---
+Roles y responsabilidades
+Actor Responsabilidad
+Actividades Clave Principal
+Solicitante
+(Área operativa
+/ usuario
+interno)
+Identificar y
+registrar
+necesidades de
+compra
+- Detectar necesidad (manual o
+automática)
+- Crear solicitud de compra (SC)
+- Definir requerimientos (cantidad,
+tipo, urgencia)
+- Dar seguimiento a su solicitud
+Sistema /
+Workflow (ERP
+/ Plataforma)
+Automatizar,
+validar y
+orquestar el
+proceso
+- Validar datos y catálogos
+- Ejecutar workflow de aprobación
+- Integrar validación presupuestal
+- Enviar RFQs automáticos
+- Generar OC automática
+- Ejecutar validación
+- Registrar bitácora y trazabilidad
+- Generar KPIs
+Finanzas Asignar y
+controlar el
+presupuesto
+- Validar disponibilidad presupuestal
+- Asignar partida / centro de costo
+- Autorizar uso de presupuesto
+- Monitorear consumo vs
+presupuesto
+Aprobador
+(Gerente /
+Dirección)
+Autorizar
+solicitudes de
+compra
+- Revisar solicitud de compra-
+Aprobar / rechazar / solicitar ajustes
+- Validar alineación operativa
+Compras Administrar el
+gasto y
+gestionar
+proveedores
+- Gestionar cotizaciones (RFQ)
+- Analizar propuestas
+- Comparar condiciones (precio,
+tiempo, calidad)
+- Seleccionar proveedor
+- Justificar decisiones
+- Generar y validar OC
+- Asegurar optimización del gasto
+Proveedor Suministrar
+bienes o
+servicios
+- Recibir RFQ- Enviar cotización
+- Recibir OC
+- Entregar bienes/servicios
+- Enviar factura
+Almacén /
+Operaciones
+Validar
+recepción de
+- Recibir productos/servicios Etapas donde
+Actúa
+1. Detección de
+necesidad
+2. Creación de
+SC
+2. Validación SC
+3. Flujo de
+aprobación
+5. Cotización
+7. Generación
+OC
+9. Validación
+factura
+11. Analítica
+3. Validación
+presupuestal
+4. Aprobación
+de SC
+5. Cotización
+6. Selección de
+proveedor
+7. Generación
+de OC
+5. Cotización
+7. Recepción OC
+8. Entrega
+9. Facturación
+8. Recepción de
+bienes/servicios
+--- PAGE 32 ---
+Tesorería Sistema BI /
+Analítica
+Auditoría /
+Control Interno
+(recomendado)
+bienes o
+ejecución de
+servicios
+Ejecutar pagos y
+gestionar flujo
+de efectivo
+Generar
+información
+para toma de
+decisiones
+Supervisar
+cumplimiento y
+control del
+proceso
+- Validar contra OC
+(cantidad/calidad)
+- Registrar evidencia (firma, fotos,
+documentos)
+- Reportar incidencias o rechazos
+- Programar pagos según
+condiciones
+- Ejecutar pagos a proveedores
+- Gestionar flujo de caja
+- Registrar ejecución de pago
+- Medir KPIs del proceso
+- Evaluar desempeño de
+proveedores
+- Generar dashboards
+- Detectar desviaciones y
+oportunidades
+- Validar trazabilidad
+- Auditar cumplimiento de políticas
+- Revisar excepciones (compras
+urgentes, proveedor único)
+- Asegurar separación de funciones
+10. Ejecución de
+pago
+11. Evaluación y
+analítica
+Transversal
+(todo el
+proceso)
+--- PAGE 33 ---
+Matriz de riesgos y control
+Riesgo Causa Impacto Compra sin
+necesidad
+real
+Falta de
+validación del
+requerimiento
+Gasto
+innecesario
+Compra sin
+presupuesto
+No validación
+financiera
+Sobregasto Sobregasto
+no
+controlado
+Exceso de
+compras
+acumuladas
+Desviación
+financiera
+Aprobaciones
+indebidas
+Falta de
+control en
+roles
+Fraude Falta de
+segregación
+de funciones
+Mismo usuario
+controla todo
+Riesgo de
+fraude
+Selección de
+proveedor
+inadecuado
+Falta de
+comparativa
+Sobreprecio
+/ mala
+calidad
+Favoritismo a
+proveedores
+Falta de
+transparencia
+Corrupción Error en
+Orden de
+Compra
+Datos
+incorrectos
+Retrasos /
+pagos
+erróneos
+Recepción
+incorrecta
+No validación
+contra OC
+Pérdida
+económica
+Recepción no
+registrada
+Omisión del
+proceso
+Falta de
+trazabilidad
+Pago sin
+validación
+Falta de
+control
+documental
+Fraude /
+pago
+indebido
+Factura
+duplicada
+Falta de
+control
+Pago
+duplicado
+Pago fuera
+de
+condiciones
+Mala
+programación
+Problemas
+de flujo de
+caja
+Control Justificación
+obligatoria en
+SC + aprobación
+Validación
+presupuestal
+obligatoria
+Control de
+presupuesto en
+tiempo real +
+alertas
+Workflow
+automatizado +
+jerarquías
+Separación:
+Finanzas ≠
+Compras ≠
+Tesorería
+Mínimo 2
+cotizaciones
+(RFQ)
+Justificación
+obligatoria de
+selección
+Generación
+automática de
+OC
+Validación física
+vs OC +
+evidencia
+Registro
+obligatorio en
+sistema
+Validación 3-
+way match
+Validación de
+folio único
+Programación
+automática de
+pagos
+Tipo Preventivo Preventivo Preventivo Preventivo Preventivo Preventivo Detectivo Preventivo Preventivo Preventivo Preventivo Preventivo Preventivo Responsable
+Aprobador
+Finanzas
+Finanzas
+Sistema
+Dirección
+Compras
+Compras /
+Auditoría
+Sistema
+Almacén
+Sistema
+Sistema
+Sistema /
+Tesorería
+Tesorería
+--- PAGE 34 ---
+Pagos
+incorrectos
+Error humano Pérdida
+económica
+Validación
+previa +
+controles de
+pago
+Compras
+fuera del
+proceso
+Falta de
+control
+Riesgo de
+fraude
+KPI + auditoría
+de compras
+Exceso de
+compras
+urgentes
+Mala
+planeación
+Costos
+elevados
+Alertas de
+compras
+urgentes
+Falta de
+trazabilidad
+Procesos
+manuales
+Problemas
+de auditoría
+Bitácora
+completa del
+proceso
+Incidencias
+no
+gestionadas
+Falta de
+seguimiento
+Impacto
+operativo
+Bitácora de
+incidencias +
+seguimiento
+Diagrama de flujo gestión de compras to-be
+Link de diagrama para consulta:
+Detectivo Tesorería
+Detectivo Auditoría
+Detectivo Sistema
+Preventivo Sistema
+Detectivo Compras
+--- PAGE 35 ---
+https://miro.com/app/board/uXjVHZpsIT4=/?share_link_id=696878227715
+--- PAGE 36 ---
+Proceso Gestión de Almacén
+El proceso de gestión de almacén TO-BE define un modelo estandarizado y controlado
+para la administración del inventario, enfocado en garantizar trazabilidad, eficiencia
+operativa y control en tiempo real. Integra la planeación, operación y control del almacén,
+incluyendo la detección de necesidades de abastecimiento mediante requisiciones que se
+conectan con el proceso de Compras, asegurando una gestión alineada, ordenada y
+basada en datos.
+Objetivo del proceso
+Establecer un modelo estandarizado, digital y basado en datos para la gestión del almacén
+que garantice:
+• Disponibilidad de materiales
+• Trazabilidad del inventario (objetivo: 100%)
+• Control operativo en tiempo real
+• Alineación entre inventario físico y sistema
+Alcance
+El proceso de gestión de almacén abarca desde la planeación de inventarios hasta la
+mejora continua, incluyendo la organización del almacén, recepción de materiales,
+control de inventario, gestión de salidas y control operativo. Asimismo, contempla la
+detección de necesidades de abastecimiento, las cuales se formalizan mediante
+requisiciones que conectan con el proceso de Compras, garantizando trazabilidad, control
+en tiempo real y alineación entre el inventario físico y el sistema.
+Proceso gestión de almacén to-be
+1.- Planeación de Inventarios
+Se realiza una planeación mensual integrada con operaciones, utilizando datos
+históricos y variables del negocio.
+Actor principal: Planeación / Operaciones
+• Áreas operativas definen necesidades mensuales
+• Se realiza el análisis de consumo histórico por producto
+• Clasificación de productos:
+o Críticos: deben mantenerse siempre en stock
+--- PAGE 37 ---
+o Bajo demanda: se compran contra necesidad
+• Se realiza evaluación de variables:
+o Precio
+o Rotación
+o Disponibilidad
+o Espacio en almacén
+• Se establecen niveles de inventario:
+o Stock mínimo
+o Stock máximo
+o Punto de reorden
+Resultado:
+• Plan de abastecimiento
+• Niveles de inventario
+2.- Organización del Almacén
+Se estructura el almacén de forma estandarizada para asegurar trazabilidad y control.
+Actor principal: Almacén
+• Definir estructura de almacenes (tipos y jerarquía)
+• Estandarizar ubicaciones:
+o Zona
+o Rack
+o Nivel
+o Posición
+• Normalizar catálogo y SKU
+• Asignar ubicación a cada producto
+• Implementar identificación visual:
+o Etiquetas
+o Códigos
+o Fotografías
+Resultado:
+• Almacen estructurado y actualizado
+• Catálogo estandarizado
+--- PAGE 38 ---
+3.- Recepción de Materiales
+Proceso estructurado de ingreso de materiales con validación total.
+Actor principal: Almacén
+• Recibir material contra Orden de Compra
+• Valida:
+▪ Cantidad
+▪ Calidad
+• Evaluar condición del material
+o Decisión:
+▪ No cumple → rechazo / devolución
+▪ Cumple → continuar
+• Registrar entrada en sistema en tiempo real
+• Generar evidencia (opcional)
+• Asignar ubicación
+Resultado:
+• Inventario actualizado
+• Registro de entrada
+4.- Control de Inventario
+Se mantiene control continuo del inventario asegurando su exactitud
+Actor principal: Almacén,
+Participa: Auditoría / Supervisión, Dirección (para validaciones críticas)/sistema
+• Monitoreo continuo
+o Consultar inventario en sistema
+o Validar niveles por producto
+• Validación contra niveles definidos
+o Comparar contra:
+▪ Stock mínimo
+▪ Punto de reorden
+o Decisión: ¿Se requiere reabastecimiento?
+▪ Condiciones:
+• Inventario < stock mínimo
+• Producto crítico sin disponibilidad
+• Proyección de consumo supera inventario
+--- PAGE 39 ---
+• Generación de requisición de compra (conexión con proceso de compras)
+o Actividades:
+▪ Identificación producto(s) a reabastecer
+▪ Definir cantidad sugerida
+▪ Genera requisición en sistema
+• Registrar:
+o Producto
+o Cantidad
+o Justificación
+o Fecha
+o Enviar requisición al área de Compras
+• Integración con proceso de Compras
+o La requisición se convierte en entrada formal del proceso de Compras
+• Control de inventario interno
+o Realizar conteos cíclicos
+o Identificar diferencias
+o Registrar ajustes con causa raíz
+o Actualizar sistema
+Resultado:
+o Requisiciones de compra
+o Inventario actualizado
+o Registro de ajustes
+5.- Control de Salidas
+Gestión controlada de salidas de materiales con clasificación y trazabilidad.
+Actor principal: Almacén
+Participa: Operaciones (solicitud) y Supervisión/Dirección (autorización).
+• Se recibe solicitud de salida
+• Se clasifica el tipo de salida:
+• Con autorización
+• Sin autorización
+• Contra cambio
+• Se valida disponibilidad
+• Autorizar salida (si aplica – Supervisión/Dirección)
+--- PAGE 40 ---
+• Preparación de pedido (picking estructurado)
+• Registro en sistema antes de entrega
+• Entrega del material
+Resultado:
+• Inventario actualizado
+• Salida registrada
+6.- Control y Orden del Almacén
+Garantizar que el almacén físico y el sistema estén completamente alineados.
+Actor principal: Almacén
+Participa: Auditoría y Supervisión
+• Validación sistema vs inventario físico
+• Implementación de orden y limpieza
+• Identificación visual de productos y ubicaciones
+• Supervisar cumplimiento (Supervisión)
+• definir periodos de auditorías programadas (1 por mes)
+Resultado:
+• Almacén organizado
+• Inventario alineado
+7.- Evaluación y Auditoría
+Se mide el desempeño del proceso mediante indicadores y auditorías.
+Actor principal: Auditoría / Supervisión
+Participa: Sistemas y Dirección
+• Se realizan auditorías periódicas programadas
+• Medir indicadores (Sistemas)
+• Analizar desviaciones (Dirección)
+• Generación de reportes
+Resultado:
+• Reportes de auditoría
+• Indicadores de desempeño (KPIs)
+--- PAGE 41 ---
+8.- Retroalimentación y Mejora Continua
+Gestión formal de mejora del proceso basada en resultados.
+Actor principal: Dirección / Administración
+Participa: Supervisión y Operaciones
+• Revisión periódica de KPIs
+• Realizar sesiones formales de retroalimentación
+• Definición de acciones correctivas (Operaciones)
+• Seguimiento y cierre (Supervisión)
+Resultado:
+• Plan de mejora
+• Acciones implementadas
+Reglas de negocio
+Reglas de Negocio Generales:
+• Todo producto debe estar registrado en el sistema antes de ser gestionado en el
+almacén.
+• Todo producto debe contar con un SKU único, estandarizado y no duplicado.
+• Todo producto debe tener una ubicación asignada dentro del almacén.
+• Todos los movimientos de inventario (entradas, salidas, ajustes) deben registrarse
+en tiempo real.
+Reglas de Negocio de recepción:
+• No se permite la recepción de materiales sin una Orden de Compra válida.
+• Toda recepción debe validarse contra la Orden de Compra en cantidad y
+especificación.
+• Todo material recibido debe pasar por una validación de calidad antes de ser
+ingresado al inventario.
+• Los materiales que no cumplan con los criterios de calidad deben ser rechazados
+o gestionados como devolución.
+• Toda recepción debe registrarse en el sistema en tiempo real antes de ser
+almacenada.
+--- PAGE 42 ---
+• Todo material recibido debe ser ubicado inmediatamente en una ubicación
+definida dentro del almacén.
+Reglas de Negocio de inventario:
+• El inventario debe ser monitoreado de forma continua mediante el sistema.
+• Se deben realizar conteos cíclicos periódicos conforme a una programación
+definida.
+• Toda diferencia entre inventario físico y sistema debe registrarse y documentarse
+con causa raíz.
+Reglas de Negocio de salidas:
+• El inventario debe ser monitoreado de forma continua mediante el sistema.
+• Se deben realizar conteos cíclicos periódicos conforme a una programación
+definida.
+• Toda diferencia entre inventario físico y sistema debe registrarse y documentarse
+con causa raíz.
+• No se permiten ajustes de inventario sin justificación documentada.
+--- PAGE 43 ---
+KPI´s proceso gestión de almacén
+KPI ¿Qué mide? Fórmula Exactitud de
+inventario (%)
+Nivel de
+coincidencia entre
+inventario físico y
+sistema
+(Inventario correcto /
+Inventario total) × 100
+Nivel de
+trazabilidad (%)
+Porcentaje de
+movimientos
+correctamente
+registrados
+(Movimientos
+registrados /
+Movimientos totales) ×
+100
+Diferencias
+inventario
+físico vs
+sistema
+Desviaciones entre
+inventario real y
+sistema
+Inventario físico –
+Inventario sistema
+Tiempo de
+recepción
+Tiempo desde que
+llega el material
+hasta su registro en
+sistema
+Hora registro – Hora
+recepción
+Tiempo de
+atención
+Tiempo desde
+solicitud hasta
+inicio de atención
+Hora inicio atención –
+Hora solicitud
+Número de
+salidas por día
+Cantidad de
+movimientos de
+salida realizados
+diariamente
+Total de salidas en el
+día
+Nivel de
+cumplimiento
+de pedidos (%)
+Pedidos entregados
+completos y en
+tiempo
+(Pedidos cumplidos /
+Pedidos totales) × 100
+% de
+movimientos
+registrados en
+tiempo real
+Grado de
+cumplimiento del
+registro inmediato
+en sistema
+(Movimientos en
+tiempo real /
+Movimientos totales) ×
+100
+Interpretación
+Mide la confiabilidad del
+inventario. Un valor
+cercano a 100% indica
+control total.
+Indica qué tan controlado
+está el flujo de inventario.
+100% = trazabilidad total.
+Permite detectar errores,
+pérdidas o fallas de
+control. Debe tender a 0.
+Evalúa la eficiencia del
+proceso de recepción.
+Ideal: registro en tiempo
+real.
+Mide la capacidad de
+respuesta del almacén.
+Menor tiempo = mayor
+eficiencia.
+Mide la carga operativa y
+productividad del almacén.
+Mide el nivel de servicio.
+Valores altos indican
+eficiencia operativa.
+Evalúa la adopción del
+sistema y control
+operativo. Objetivo: 100%.
+--- PAGE 44 ---
+% de
+incidencias
+general
+Frecuencia de
+errores en
+entradas, salidas o
+inventario
+% de
+recepciones
+con incidencias
+Recepciones con
+errores de cantidad
+o calidad
+Tiempo de
+validación en
+recepción
+Tiempo de revisión
+de calidad y
+cantidad
+Nivel de
+cumplimiento
+(%) (Orden y
+control)
+Nivel de orden,
+limpieza y
+organización del
+almacén (5S)
+Alineación
+sistema vs
+inventario
+físico (%)
+Coincidencia entre
+sistema y realidad
+Roles y responsabilidades
+Actor Responsabilidad Planeación /
+Operaciones
+Definir la demanda
+y necesidades de
+inventario
+alineadas a la
+operación
+Compras Abastecer
+materiales
+conforme a la
+planeación definida
+Almacén Gestionar el control
+operativo del
+inventario físico y
+digital
+(Incidencias totales /
+Movimientos totales) ×
+100
+(Recepciones con error
+/ Recepciones totales)
+× 100
+Hora validación – Hora
+recepción
+(Puntos cumplidos /
+Puntos evaluados) ×
+100
+(Productos correctos /
+Productos revisados) ×
+100
+Actividad clave - Proyectar demanda
+mensual
+- Analizar consumo
+histórico
+- Clasificar productos
+(críticos / bajo
+demanda)
+- Definir niveles de
+inventario
+- Generar órdenes de
+compra
+- Coordinar entregas
+con proveedores
+- Asegurar
+disponibilidad de
+materiales
+- Recepción de
+materiales
+- Registro de entradas
+y salidas en sistema
+Permite identificar fallas
+operativas. Debe ser lo
+más bajo posible.
+Evalúa calidad del proceso
+de recepción y
+proveedores.
+Mide eficiencia del control
+de calidad.
+Evalúa disciplina operativa.
+Impacta directamente en
+eficiencia y errores.
+Mide control general del
+almacén. Ideal: ≥ 98%.
+Etapas donde actua
+Planeación de inventarios
+Planeación / Recepción
+Organización / Recepción /
+Inventario / Salidas /
+Control
+--- PAGE 45 ---
+Calidad Auditoría /
+Supervisión
+Dirección /
+Administración
+Validar que los
+materiales cumplan
+con los estándares
+requeridos
+Asegurar
+cumplimiento del
+proceso y exactitud
+del inventario
+Dar seguimiento
+estratégico al
+desempeño del
+almacén
+- Asignación de
+ubicaciones
+- Preparación de
+pedidos (picking)
+- Control de
+inventario  - Ejecución
+de conteos cíclicos
+- Inspección de calidad
+en recepción
+- Validación de
+condiciones del
+producto
+- Aprobación o
+rechazo de materiales
+- Auditorías
+periódicas  -
+Validación físico vs
+sistema
+- Identificación de
+desviaciones
+- Seguimiento a
+diferencias
+- Revisión de KPIs
+- Toma de decisiones
+estratégicas
+- Priorización de
+acciones de mejora
+Recepción
+Evaluación / Control
+Evaluación /
+Retroalimentación
+--- PAGE 46 ---
+Matriz de riesgos y control
+Etapa del
+Riesgo Impacto proceso
+Planeación Planeació
+n
+incorrecta
+de
+inventario
+s
+Falta o
+exceso de
+stock
+Planeación No
+clasificació
+n de
+productos
+(críticos /
+demanda)
+Desabasto
+de
+productos
+críticos
+Organización Ubicacion
+es no
+estandariz
+adas
+Pérdida de
+trazabilida
+d
+Organización SKU
+duplicados
+o mal
+definidos
+Errores en
+inventario
+Recepción Recepción
+sin orden
+de compra
+Ingreso no
+controlado
+de
+material
+Recepción Error en
+validación
+de
+cantidad o
+calidad
+Inventario
+incorrecto
+Recepción Registro
+tardío de
+entradas
+Desfase
+sistema vs
+físico
+Probabili
+Nive
+Control dad
+l de
+ries
+go
+Media Alto Planeació
+n basada
+en
+histórico
+s +
+validació
+n con
+operacio
+nes
+Media Alto Clasificac
+ión
+obligatori
+a de
+producto
+s
+Alta Alto Estructur
+a
+definida
+de
+ubicacion
+es (zona,
+rack,
+nivel)
+Media Alto Catálogo
+centraliz
+ado y
+validado
+Baja Alto Bloqueo
+de
+recepció
+n sin OC
+Media Alto Validació
+n
+obligatori
+a +
+control
+de
+calidad
+Alta Alto Registro
+en
+tiempo
+Tipo de
+control
+Prevent
+ivo
+Prevent
+ivo
+Prevent
+ivo
+Prevent
+ivo
+Prevent
+ivo
+Prevent
+ivo
+Prevent
+ivo
+Respons
+able
+Planeaci
+ón
+Planeaci
+ón
+Almacén
+Sistemas
+/
+Almacén
+Almacén
+Almacén
+/ Calidad
+Almacén
+--- PAGE 47 ---
+Inventario Inventario Inventario Inventario Compras
+(conexión)
+Salidas Salidas Salidas Diferencia
+s físico vs
+sistema
+Ajustes sin
+justificació
+n
+No
+detección
+de niveles
+mínimos
+No
+generació
+n de
+requisicio
+nes
+Requisició
+n
+a
+incomplet
+Entrega
+sin
+registro
+Clasificaci
+ón
+incorrecta
+de salida
+Picking
+incorrecto
+Pérdidas y
+descontrol
+Riesgo de
+fraude o
+error
+Desabasto
+de
+materiales
+Falta de
+abastecimi
+ento
+Retrasos
+en compra
+Pérdida de
+control
+Falta de
+control
+operativo
+Entregas
+erróneas
+Alta Alto Media Alto Media Alto Media Alto Media Med
+io
+Alta Alto Media Med
+io
+Media Med
+io
+real
+obligatori
+o
+Conteos
+cíclicos
+periódico
+s
+Registro
+obligatori
+o de
+causa
+raíz
+Monitore
+o
+automáti
+co de
+stock
+mínimo
+Requisici
+ón
+obligatori
+a al
+detectar
+necesida
+d
+Validació
+n de
+campos
+obligatori
+os en
+requisici
+ón
+Bloqueo
+de salida
+sin
+registro
+previo
+Clasificac
+ión
+obligatori
+a de
+salidas
+Validació
+n contra
+solicitud
+Detecti
+vo
+Detecti
+vo
+Prevent
+ivo
+Prevent
+ivo
+Prevent
+ivo
+Prevent
+ivo
+Prevent
+ivo
+Detecti
+vo
+Almacén
+Almacén
+/
+Auditoría
+Sistemas
+/
+Almacén
+Almacén
+Almacén
+/
+Sistemas
+Almacén
+Almacén
+Almacén
+--- PAGE 48 ---
+Control Desalineac
+ión
+sistema vs
+físico
+Informació
+n poco
+confiable
+Alta Alto Validació
+n
+periódica
+físico vs
+sistema
+Control Falta de
+orden (5S)
+Ineficienci
+a
+operativa
+Media Med
+io
+Auditoría
+s de
+orden y
+limpieza
+Evaluación Falta de
+auditorías
+Problemas
+no
+detectados
+Media Alto Auditoría
+s
+s
+periódica
+program
+adas
+Evaluación KPIs no
+medidos
+Falta de
+control del
+proceso
+Media Alto Seguimie
+nto de
+indicador
+es
+Retroaliment
+ación
+No
+seguimien
+to a
+desviacion
+es
+Repetición
+de errores
+Media Alto Plan de
+acción y
+seguimie
+nto
+obligatori
+o
+Sistemas Fallo del
+sistema
+Paro
+operativo
+Baja Alto Plan de
+continge
+ncia
+General Falta de
+trazabilida
+d
+Pérdida
+total de
+control
+Alta Críti
+co
+Trazabili
+dad
+100%
+obligatori
+a
+Diagrama de flujo gestión de almacén to-be
+Detecti
+vo
+Prevent
+ivo
+Detecti
+vo
+Detecti
+vo
+Prevent
+ivo
+Prevent
+ivo
+Prevent
+ivo
+Almacén
+/
+Auditoría
+Almacén
+Auditoría
+Direcció
+n
+Direcció
+n
+Sistemas
+Toda la
+organiza
+ción
+--- PAGE 49 ---
+Proceso gestión de mantenimiento
+El proceso de gestión de mantenimiento TO-BE establece un modelo estructurado y
+estandarizado para la administración de los mantenimientos preventivos y correctivos de
+las unidades de recolección, basado en principios de mantenimiento centrado en
+confiabilidad (RCM). Este enfoque permite pasar de un esquema reactivo a uno
+preventivo y controlado, donde las decisiones se toman con base en criterios técnicos,
+reglas definidas y datos operativos, asegurando la trazabilidad de cada evento, la
+disponibilidad de las unidades y la mejora continua de la operación.
+Objetivo del proceso
+Asegurar la disponibilidad, confiabilidad y seguridad de los activos (unidades, planta e
+instalaciones) mediante un sistema estructurado de mantenimiento preventivo y
+correctivo, basado en criterios técnicos, trazabilidad completa y control operativo en
+tiempo real.
+Alcance
+El proceso de gestión de mantenimiento abarca la planeación, ejecución, control y
+seguimiento de los mantenimientos preventivos y correctivos de las unidades de
+recolección, desde la detección de eventos hasta su cierre y análisis. Incluye la inspección
+pre-operativa, el registro y clasificación de fallas bajo criterios técnicos, la programación
+con base en ventanas de mantenimiento, la ejecución de trabajos, su validación y la
+generación de indicadores para mejora continua, asegurando la disponibilidad, seguridad
+y confiabilidad de las unidades.
+Proceso gestión de mantenimiento to-be
+1.- Detección del evento
+Actores que participan:
+• Operador
+• Sistema
+• Técnico
+• Encargado de mantenimiento
+Entradas:
+• Checklist pre-operativo
+• Medición de km / horas
+• Observación en operación
+Actividades:
+--- PAGE 50 ---
+• El operador ejecuta checklist pre-operativo  1.2 Verifica condiciones:
+• Fugas
+• Presión
+• Estado de mangueras
+• Sistema de bombeo
+• Frenos / llantas
+• El sistema evalúa:
+• Km vs límite preventivo
+• Horas vs límite preventivo
+• El operador detecta anomalías durante operación (si aplica)
+• Se identifica:
+• Falla
+• Condición de riesgo
+• Necesidad de mantenimiento preventivo
+Decisión:
+¿Existe anomalía o mantenimiento requerido?
+• NO → Continúa operación
+• SÍ → pasa a registro
+Resultado:
+• Evento identificado
+2. Registro del evento
+Actores que participan:
+• Operador / Técnico
+• Auxiliar administrativo
+• Sistema
+Entradas:
+• Evento detectado
+Actividades:
+• Se captura el evento en sistema (Herramienta digital)
+--- PAGE 51 ---
+• Se registra:
+• ID de unidad
+• Tipo de evento (preventivo / correctivo)
+• Sistema afectado
+• Descripción detallada
+• Fecha y hora
+• Usuario
+• Se capturan evidencias:
+• Fotografías
+• Videos
+• Resultado de checklist
+• Se registran medidores:
+• Km (odómetro)
+• Horas (horómetro)
+• El sistema valida:
+• Campos obligatorios
+• Evidencia
+• Se genera folio automático
+Reglas que se deben de respetar:
+• Evento sin registro → no existe
+• Evento sin evidencia → no avanza
+• Uso de formatos homologados obligatorio
+Resultado:
+• Evento registrado y trazable
+3. Clasificación de la falla
+Actores que participan:
+• Encargado de mantenimiento
+• Técnico
+Entradas:
+• Evento registrado
+Actividades:
+--- PAGE 52 ---
+• Evaluar condición de seguridad:
+• ¿Existe riesgo inmediato?
+• Evaluar cumplimiento legal:
+• ¿Incumple norma?
+• Evaluar capacidad técnica:
+• ¿Se puede diagnosticar?
+• Clasificar urgencia:
+• Crítico → detiene operación
+• Alto → atención prioritaria
+• Bajo → programable
+• Estimar rango de costo:
+• A / B / C / D
+Resultado (Asignación de estado):
+• Disponible
+• Disponible con restricción
+• En mantenimiento
+• Fuera de servicio
+Reglas que se deben de respetar:
+• Seguridad → detención inmediata
+• Legal → no operar
+• Sin certeza técnica → escalar
+Resultado:
+• Evento clasificado + estatus
+4. Toma de decisión
+Actores que participan:
+• Encargado de mantenimiento
+• Dirección
+• Finanzas
+Entradas:
+• Evento clasificado
+Actividades:
+--- PAGE 53 ---
+• Evaluar criterios de decisión  4.2 Definir acción:
+• Ejecutar inmediato
+• Programar mantenimiento
+• Escalar
+• Permitir operación restringida
+Reglas que se deben de respetar:
+• Preventivo → obligatorio
+• Riesgo → no operar
+• Costos altos → aprobación
+Resultados:
+• Acción definida
+5. Programación
+Actores que participan:
+• Encargado de mantenimiento
+• Coordinador de operaciones
+Entradas:
+• Acción definida
+Actividades:
+• 5.1 Definir fecha de mantenimiento
+• 5.2 Validar disponibilidad de unidad
+• 5.3 Coordinar salida de operación
+• 5.4 Asignar técnico o proveedor
+• 5.5 Generar orden de mantenimiento
+--- PAGE 54 ---
+Gestión de ventanas de mantenimiento:
+Supuesto:  * Mantenimiento preventivo cada 10,000 km
+Regla crítica:
+Resultado:
+• Fuera de tolerancia → detención automática
+• Orden programada
+6. Ejecución del mantenimiento
+Actores que participan:
+• Técnico
+• Proveedor
+• Encargado
+Entrada:
+• Orden de mantenimiento
+Actividades:
+• 6.1 Recepción de orden
+--- PAGE 55 ---
+• 6.2 Diagnóstico técnico
+• 6.3 Ejecución de mantenimiento:
+• Reparación
+• Ajuste
+• Reemplazo
+• Registro en sistema:
+• Actividades
+• Refacciones
+• Tiempo
+• 6.5 Captura de evidencia
+Reglas que se deben de respetar:
+• Todo se registra
+• Evidencia obligatoria
+Resultados:
+• Mantenimiento ejecutado
+7. Validación
+Actores que participan:
+• Encargado de mantenimiento
+Entradas:
+• Mantenimiento ejecutado
+Actividades:
+• Verificar ejecución
+• Validar seguridad
+• Validar operatividad
+• Revisar evidencia
+• Pruebas funcionales
+Regla que se debe de considerar:
+--- PAGE 56 ---
+• No se puede cerrar sin validación
+Resultado:
+• Evento validado
+8. Cierre
+Actores que participan:
+• Auxiliar
+• Encargado
+Entradas:
+• Evento validado
+Actividades:
+• Registrar:
+• Acción realizada
+• Costo real
+• Observaciones
+• Actualizar estatus:
+• Disponible / restricción
+• Cerrar evento en sistema
+Resultado:
+• Evento cerrado
+9. Reporte de mejora continua
+Actores que participan:
+• Encargado
+• Dirección
+Actividades:
+• Generar KPIs
+--- PAGE 57 ---
+• Analizar fallas recurrentes
+• Realizar análisis causa raíz
+• Ajustar rutinas preventivas
+Resultado:
+• Mejora del sistema
+Reglas de negocio
+Generales
+• Todo evento de mantenimiento debe ser registrado en el sistema con información
+mínima obligatoria.  - Evento no registrado se considera inexistente.
+• Todo evento debe contar con evidencia (fotográfica, checklist o documental) para
+poder avanzar en el flujo.
+• Las decisiones del proceso deben basarse en criterios definidos (seguridad, legal,
+técnico, urgencia, costo), no en juicio personal.
+• El sistema debe garantizar trazabilidad completa de cada evento desde su
+detección hasta su cierre.
+• No se permite la ejecución de mantenimiento sin una orden de mantenimiento
+previamente generada.
+•
+Seguridad y cumplimmiento
+• Ninguna unidad puede operar si representa riesgo para la seguridad de personas
+o activos.
+• Ninguna unidad puede operar si incumple requisitos legales o normativos
+aplicables.
+• Si una falla compromete seguridad o cumplimiento legal, la unidad debe cambiar
+automáticamente a estatus:  - Fuera de servicio
+• Los criterios de seguridad y cumplimiento legal prevalecen sobre cualquier
+consideración operativa o económica.
+--- PAGE 58 ---
+KPI´s proceso de mantenimiento
+Categoría KPI Cómo se calcula Disponibilidad
+Disponibilidad de
+unidades (%)
+(Unidades
+disponibles / Total) ×
+100
+Disponibilidad
+% unidades fuera
+de servicio
+(Fuera de servicio /
+Total) × 100
+Eficiencia Tiempo de
+respuesta
+Hora atención - hora
+registro
+Eficiencia Tiempo de
+ejecución
+Hora fin - hora inicio Eficiencia Órdenes
+atendidas vs
+generadas (%)
+(Atendidas /
+Generadas) × 100
+Preventivo % cumplimiento
+de preventivos
+(Preventivos
+realizados /
+programados) × 100
+Preventivo % cumplimiento
+de ventanas
+(Preventivos en
+ventana / total) ×
+100
+Preventivo % preventivo vs
+correctivo
+(Preventivos / total
+eventos) × 100
+Fallas Fallas en ruta Conteo mensual Fallas Fallas
+recurrentes
+Conteo de repetición Costos Costo total de
+mantenimiento
+Suma de costos Costos Costo por unidad Costo total /
+unidades
+Costos Costo preventivo
+vs correctivo
+Comparativo Control % eventos
+registrados
+(Registrados /
+detectados) × 100
+Ejemplo
+sencillo
+17 de 20 →
+85%
+3 de 20 →
+15%
+8:00 a 10:00
+→ 2 hrs
+10:00 a
+14:00 → 4
+hrs
+45 de 50 →
+90%
+18 de 20 →
+90%
+16 de 20 →
+80%
+80 de 100 →
+80%
+6 fallas 3 fallas
+repetidas
+$120,000 $120,000 /
+20 = $6,000
+$40k vs $80k 100 de 100
+→ 100%
+¿Qué indica?
+Qué porcentaje
+de unidades está
+listo para operar
+Cuántas
+unidades están
+detenidas
+Qué tan rápido
+reaccionas ante
+fallas
+Qué tan rápido
+se resuelve el
+mantenimiento
+Nivel de
+cumplimiento
+operativo
+Disciplina en
+mantenimiento
+preventivo
+Si el
+mantenimiento
+se hace a tiempo
+Nivel de madurez
+del sistema (ideal
+80/20)
+Nivel de
+confiabilidad en
+operación
+Problemas no
+resueltos de raíz
+Gasto total en
+mantenimiento
+Eficiencia por
+unidad
+Si el sistema es
+reactivo o
+preventivo
+Nivel de control
+del proceso
+--- PAGE 59 ---
+Roles y responsabilidades
+Actor Rol Responsabilidade
+s
+Operador /
+Chofer
+Ejecutor en
+campo y
+primer punto
+de detección
+- Asegurar
+condiciones
+básicas de la
+unidad
+- Detectar fallas o
+anomalías
+- Cumplir con
+inspección
+obligatoria
+- Reportar
+incidencias
+oportunamente
+Técnico de
+mantenimient
+o
+Ejecutor
+técnico de
+mantenimient
+o
+- Ejecutar
+mantenimientos
+preventivos y
+correctivos
+- Diagnosticar
+fallas
+- Garantizar
+correcta ejecución
+técnica
+- Documentar
+trabajos
+realizados
+Encargado de
+mantenimient
+o (Dueño del
+proceso)
+Responsable
+del control
+operativo y
+toma de
+decisiones
+- Controlar el
+proceso de
+mantenimiento
+- Clasificar
+eventos bajo
+criterios RCM
+Actividades
+clave
+- Ejecutar
+checklist pre-
+operativo
+- Identificar
+fugas, daños o
+anomalías
+- Reportar
+eventos en
+sistema
+- Capturar
+evidencia básica
+(fotos/checklist)
+- Detener
+operación si
+aplica
+- Analizar fallas
+detectadas
+- Ejecutar
+mantenimiento
+(reparación,
+ajuste,
+reemplazo)
+- Registrar
+actividades,
+tiempos y
+refacciones
+- Capturar
+evidencia técnica
+- Reportar
+nuevas
+anomalías
+- Evaluar eventos
+(seguridad, legal,
+técnico,
+urgencia, costo)
+- Definir acción
+(ejecutar,
+Etapas donde
+participa
+1. Detección
+2. Registro
+3. Clasificación
+(apoyo)
+6. Ejecución
+7. Validación
+(soporte)
+3.Clasificación
+4. Decisión
+5.Programación6
+. Supervisión
+7. Validación
+8. Cierre
+--- PAGE 60 ---
+Auxiliar
+administrativo
+de
+mantenimient
+o
+Coordinador
+de operaciones
+/ Logística
+Finanzas /
+Tesorería
+Soporte
+administrativo
+y control
+documental
+Gestión de
+disponibilidad
+operativa
+Control y
+autorización
+financiera
+- Definir estatus
+de unidades
+- Tomar
+decisiones
+operativas
+- Validar trabajos
+realizados
+- Asegurar
+cumplimiento del
+sistema
+- Asegurar registro
+completo de
+eventos
+- Dar seguimiento
+a órdenes
+- Controlar
+documentación y
+evidencia
+- Garantizar
+trazabilidad
+- Asegurar
+disponibilidad de
+unidades
+- Coordinar
+operación vs
+mantenimiento
+- Evitar afectación
+operativa
+- Validar costos de
+mantenimiento
+- Autorizar gastos
+fuera de rango
+- Controlar
+impacto
+financiero
+programar,
+escalar)
+- Programar
+mantenimientos
+- Supervisar
+ejecución
+- Validar
+operatividad y
+seguridad
+- Autorizar cierre
+- Analizar KPIs y
+mejora continua
+- Registrar
+eventos (si
+aplica)
+- Validar que la
+información esté
+completa
+- Dar
+seguimiento a
+órdenes abiertas
+- Registrar costos
+y cierre en
+sistema
+- Archivar
+evidencia
+- Validar estatus
+de unidades
+- Coordinar
+salida de
+unidades a
+mantenimiento
+- Reprogramar
+rutas
+- Priorizar
+unidades críticas
+para operación
+- Revisar costos
+estimados
+- Autorizar
+correctivos de
+alto costo
+- Validar
+presupuesto
+- Registrar
+impacto
+financiero
+9. Reporte
+2. Registro
+8. Cierre
+5.Programación
+4. Decisión
+(cuando aplica)
+--- PAGE 61 ---
+Dirección /
+Gerencia
+Supervisión
+estratégica
+- Definir
+lineamientos del
+sistema
+- Tomar
+decisiones
+estratégicas
+- Supervisar
+desempeño del
+área
+Sistema (Soft
+Flot /
+Integración)
+Soporte
+tecnológico y
+automatizació
+n
+- Automatizar el
+proceso
+- Asegurar
+trazabilidad
+- Validar reglas de
+negocio
+- Controlar
+estatus de
+unidades
+Matriz de riesgos y control
+- Aprobar
+decisiones
+críticas
+- Revisar KPIs
+- Evaluar
+renovación de
+unidades
+- Definir mejoras
+estratégicas
+4. Decisión
+(casos críticos)
+9. Reporte
+- Generar alertas
+(km / horas /
+ventanas)
+- Validar campos
+obligatorios
+- Generar folios
+- Bloquear
+unidades
+automáticament
+e
+- Registrar
+eventos
+- Controlar
+estatus en
+tiempo real
+- Generar
+reportes y KPIs
+1. Detección
+2. Registro
+3. Clasificación
+(soporte)
+5.Programación6
+. Ejecución
+8. Cierre
+9. Reporte
+--- PAGE 62 ---
+Riesgo Operación
+de unidad
+en
+condicion
+es
+inseguras
+Falta de
+registro
+de
+eventos
+Eventos
+sin
+evidencia
+Clasificaci
+ón
+incorrecta
+de fallas
+Toma de
+decisiones
+subjetiva
+No
+ejecución
+de
+mantenim
+iento
+preventiv
+o
+Mantenim
+iento
+fuera de
+tiempo
+(tardío)
+Causa No se
+realiza
+inspecció
+n o se
+ignoran
+resultados
+Omisión
+por parte
+del
+usuario o
+falla de
+control
+Falta de
+disciplina
+o
+herramien
+tas
+Falta de
+criterio
+técnico o
+capacitaci
+ón
+Dependen
+cia de
+personas
+Falta de
+control o
+mala
+planificaci
+ón
+No
+respetar
+ventanas
+Impacto Accidente
+s, daño a
+activos,
+riesgo a
+personas
+Pérdida
+de
+trazabilida
+d y
+control
+Auditorías
+fallidas,
+decisiones
+incorrecta
+s
+Decisione
+s
+incorrecta
+s, riesgo
+operativo
+Ineficienci
+a
+operativa
+Increment
+o de fallas
+y costos
+Mayor
+probabilid
+ad de falla
+Probabil
+Severi
+Controles idad
+dad
+Alta Crítica Inspección
+pre-
+operativa
+obligatoria
++ bloqueo
+automático
+por sistema
+Media Alta Registro
+obligatorio
++ validación
+de campos
++ folio
+automático
+Media Alta Evidencia
+obligatoria
+para
+avanzar en
+flujo
+Media Alta Uso de
+criterios
+RCM
+(seguridad,
+legal,
+técnico,
+urgencia,
+costo)
+Media Alta Reglas de
+negocio
+definidas y
+automatiza
+ción en
+sistema
+Alta Crítica Control por
+ventanas +
+alertas +
+detención
+automática
+fuera de
+tolerancia
+Alta Alta Gestión de
+ventanas (-
+20%, +10%)
+y bloqueo
+automático
+Tipo
+de
+contro
+l
+Preven
+tivo
+Preven
+tivo /
+Detect
+ivo
+Preven
+tivo
+Preven
+tivo
+Preven
+tivo
+Preven
+tivo
+Preven
+tivo
+Responsa
+ble
+Operador
+/ Sistema
+Sistema /
+Auxiliar
+Sistema /
+Técnico
+Encargad
+o
+mantenim
+iento
+Encargad
+o
+Sistema /
+Encargad
+o
+Sistema
+--- PAGE 63 ---
+Fallas
+recurrent
+es no
+atendidas
+Retrasos
+en
+atención
+de
+eventos
+Ejecución
+incorrecta
+del
+mantenim
+iento
+Cierre de
+eventos
+sin
+validación
+Baja
+disponibili
+dad de
+unidades
+Informaci
+ón
+inconsiste
+nte
+Dependen
+cia de
+personas
+clave
+Falta de
+integració
+n
+tecnológic
+a
+No
+detección
+oportuna
+de
+mantenim
+iento
+No se
+analiza
+causa raíz
+Mala
+priorizació
+n
+Falta de
+supervisió
+n o
+capacitaci
+ón
+Omisión
+del
+proceso
+Mala
+gestión de
+mantenim
+iento
+Falta de
+estandariz
+ación
+No hay
+roles
+definidos
+Sistemas
+aislados
+Falta de
+automatiz
+ación
+Increment
+o de
+costos y
+fallas
+Afectació
+n a
+operación
+Re-
+trabajos,
+fallas
+posteriore
+s
+Pérdida
+de control
+y calidad
+Incumpli
+miento
+operativo
+Errores en
+análisis y
+decisiones
+Riesgo
+operativo
+alto
+Ineficienci
+a y
+duplicidad
+Fallas en
+operación
+Media Alta KPI de
+recurrencia
++ análisis
+de causa
+raíz + ajuste
+preventivo
+Alta Alta Clasificació
+n por
+urgencia +
+tiempos
+definidos
+Media Alta Validación
+obligatoria
++ checklist
+técnico
+Media Alta Regla de no
+cierre sin
+validación
+en sistema
+Alta Crítica KPI de
+disponibilid
+ad +
+programaci
+ón eficiente
+Media Media Homologaci
+ón de
+formatos y
+validacione
+s en
+sistema
+Media Alta Definición
+de roles y
+responsabil
+idades
+Media Media Evaluación
+e
+integración
+con Soft
+Flot / ERP
+Alta Alta Alertas
+automática
+s por
+km/horas
+Correc
+tivo /
+Preven
+tivo
+Preven
+tivo
+Detect
+ivo
+Preven
+tivo
+Preven
+tivo
+Preven
+tivo
+Preven
+tivo
+Preven
+tivo
+Preven
+tivo
+Encargad
+o
+Encargad
+o
+Encargad
+o /
+Técnico
+Sistema
+Operacion
+es /
+Encargad
+o
+Auxiliar /
+Sistema
+Dirección
+TI /
+Dirección
+Sistema
+--- PAGE 64 ---
+Uso
+incorrecto
+de
+refaccione
+s
+Incumpli
+miento
+ambiental
+(residuos)
+Falta de
+control o
+registro
+Increment
+o de
+costos
+Manejo
+incorrecto
+de
+residuos
+Multas,
+sanciones
+legales
+Sobrecarg
+a del
+equipo de
+mantenim
+iento
+Falta de
+mejora
+continua
+Mala
+planificaci
+ón
+Retrasos
+en
+ejecución
+No uso de
+KPIs
+Estancami
+ento del
+sistema
+Media Media Registro
+obligatorio
+de
+refacciones
++ validación
+técnica
+Baja Crítica Gestión con
+proveedore
+s
+autorizados
++ control
+documental
+Media Media KPI de
+carga de
+trabajo +
+planeación
+de recursos
+Media Media Reportes
+periódicos
++ análisis
+de
+indicadores
+Detect
+ivo
+Técnico
+Preven
+tivo
+Mantenim
+iento
+Detect
+ivo
+Encargad
+o
+Preven
+tivo
+Dirección
+Diagrama de flujo gestión de mantenimiento to-be
+--- PAGE 65 ---
+Término Palabra/Concepto Descripción
+Descripción

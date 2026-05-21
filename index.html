@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cantera Digital | Documentación de Procesos</title>
+    
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- Mobile Hamburger -->
+    <div class="mobile-header">
+        <img src="img/Logo.svg" alt="Cantera Digital Logo" class="mobile-logo">
+        <div class="hamburger">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-container">
+                    <img src="img/Logo.svg" alt="Cantera Digital Logo" class="logo">
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <!-- GESTIÓN DE PAGOS -->
+                <div class="nav-section">
+                    <h3 class="nav-section-title">GESTIÓN DE PAGOS</h3>
+                    <ul class="nav-list">
+                        <li>
+                            <button class="nav-item active" data-target="pagos-contexto">
+                                <span class="icon">🌐</span> Objetivo y Alcance
+                            </button>
+                        </li>
+                        <li>
+                            <button class="nav-item" data-target="pagos-proceso">
+                                <span class="icon">🔄</span> Proceso TO-BE
+                            </button>
+                        </li>
+                        <li>
+                            <button class="nav-item" data-target="pagos-reglas">
+                                <span class="icon">⚠️</span> Reglas de Negocio
+                            </button>
+                        </li>
+                        <li>
+                            <button class="nav-item" data-target="pagos-kpis">
+                                <span class="icon">📊</span> KPIs
+                            </button>
+                        </li>
+                        <li>
+                            <button class="nav-item" data-target="pagos-roles">
+                                <span class="icon">👥</span> Roles y Responsabilidades
+                            </button>
+                        </li>
+                        <li>
+                            <button class="nav-item" data-target="pagos-riesgos">
+                                <span class="icon">🛡️</span> Matriz de Riesgos
+                            </button>
+                        </li>
+                        <li>
+                            <button class="nav-item" data-target="pagos-diagrama">
+                                <span class="icon">🗺️</span> Diagrama de Flujo
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- GESTIÓN DE COMPRAS -->
+                <div class="nav-section">
+                    <h3 class="nav-section-title">GESTIÓN DE COMPRAS</h3>
+                    <ul class="nav-list">
+                        <li>
+                            <button class="nav-item" data-target="compras-contexto">
+                                <span class="icon">🌐</span> Objetivo y Alcance
+                            </button>
+                        </li>
+                        <li>
+                            <button class="nav-item" data-target="compras-proceso">
+                                <span class="icon">🔄</span> Proceso TO-BE
+                            </button>
+                        </li>
+                        <li>
+                            <button class="nav-item" data-target="compras-reglas">
+                                <span class="icon">⚠️</span> Reglas de Negocio
+                            </button>
+                        </li>
+                        <li>
+                            <button class="nav-item" data-target="compras-kpis">
+                                <span class="icon">📊</span> KPIs
+                            </button>
+                        </li>
+                        <li>
+                            <button class="nav-item" data-target="compras-roles">
+                                <span class="icon">👥</span> Roles y Responsabilidades
+                            </button>
+                        </li>
+                        <li>
+                            <button class="nav-item" data-target="compras-riesgos">
+                                <span class="icon">🛡️</span> Matriz de Riesgos
+                            </button>
+                        </li>
+                        <li>
+                            <button class="nav-item" data-target="compras-diagrama">
+                                <span class="icon">🗺️</span> Diagrama de Flujo
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- GESTIÓN DE ALMACÉN -->
+                <div class="nav-section">
+                    <h3 class="nav-section-title">GESTIÓN DE ALMACÉN</h3>
+                    <ul class="nav-list">
+                        <li>
+                            <button class="nav-item" data-target="almacen-contexto">
+                                <span class="icon">🌐</span> Objetivo y Alcance
+                            </button>
+                        </li>
+                        <li>
+                            <button class="nav-item" data-target="almacen-proceso">
+                                <span class="icon">🔄</span> Proceso TO-BE
+                            </button>
+                        </li>
+                        <li>
+                            <button class="nav-item" data-target="almacen-reglas">
+                                <span class="icon">⚠️</span> Reglas de Negocio
+                            </button>
+                        </li>
+                        <li>
+                            <button class="nav-item" data-target="almacen-kpis">
+                                <span class="icon">📊</span> KPIs
+                            </button>
+                        </li>
+                        <li>
+                            <button class="nav-item" data-target="almacen-roles">
+                                <span class="icon">👥</span> Roles y Responsabilidades
+                            </button>
+                        </li>
+                        <li>
+                            <button class="nav-item" data-target="almacen-riesgos">
+                                <span class="icon">🛡️</span> Matriz de Riesgos
+                            </button>
+                        </li>
+                        <li>
+                            <button class="nav-item" data-target="almacen-diagrama">
+                                <span class="icon">🗺️</span> Diagrama de Flujo
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- GESTIÓN DE MANTENIMIENTO -->
+                <div class="nav-section">
+                    <h3 class="nav-section-title">GESTIÓN DE MANTENIMIENTO</h3>
+                    <ul class="nav-list">
+                        <li>
+                            <button class="nav-item" data-target="mantenimiento-contexto">
+                                <span class="icon">🌐</span> Objetivo y Alcance
+                            </button>
+                        </li>
+                        <li>
+                            <button class="nav-item" data-target="mantenimiento-proceso">
+                                <span class="icon">🔄</span> Proceso TO-BE
+                            </button>
+                        </li>
+                        <li>
+                            <button class="nav-item" data-target="mantenimiento-reglas">
+                                <span class="icon">⚠️</span> Reglas de Negocio
+                            </button>
+                        </li>
+                        <li>
+                            <button class="nav-item" data-target="mantenimiento-kpis">
+                                <span class="icon">📊</span> KPIs
+                            </button>
+                        </li>
+                        <li>
+                            <button class="nav-item" data-target="mantenimiento-roles">
+                                <span class="icon">👥</span> Roles y Responsabilidades
+                            </button>
+                        </li>
+                        <li>
+                            <button class="nav-item" data-target="mantenimiento-riesgos">
+                                <span class="icon">🛡️</span> Matriz de Riesgos
+                            </button>
+                        </li>
+                        <li>
+                            <button class="nav-item" data-target="mantenimiento-diagrama">
+                                <span class="icon">🗺️</span> Diagrama de Flujo
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <div id="dynamic-content-container" class="content-wrapper fade-in">
+                <!-- Content will be injected here via JavaScript -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Custom JS -->
+    <script src="app.js"></script>
+</body>
+</html>
