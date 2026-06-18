@@ -1,314 +1,366 @@
 // Base de datos estructurada a partir de los documentos PDF y DOCX (Cambios)
 const pdfData = {
     pagos: {
-        contexto: {
-            icon: "🌐",
-            title: "Gestión de Pagos",
-            objetivo: "Garantizar que los pagos a proveedores (generadores) se realicen de forma correcta, trazable, oportuna y controlada, utilizando información confiable proveniente de MUTA, alineada a reglas financieras y validaciones administrativas.",
-            alcance: "Desde la extracción de datos en MUTA hasta la ejecución del pago y conciliación contable, incluyendo validación, consolidación, cálculo, orden de pago, facturación, aprobación y control."
-        },
-        proceso: [
-            { step: "0", title: "Validación Operativa (Antes de cada extracción)", actor: "Logística y Recolección", desc: "Validar en campo:<br>&emsp; • Registro de recolección<br>&emsp; • Kilos capturados<br>&emsp; • Evidencias (foto, firma, nombre)<br>&emsp; • Dirección correcta", consid: "• Las evidencias son obligatorias en MUTA (candado operativo)", res: "-" },
-            { step: "1", title: "Extracción de datos desde MUTA", actor: "Administración", desc: "Descarga de reporte de recolecciones desde MUTA:<br>&emsp;  • Código interno generador<br>&emsp;  • Fecha de recolección<br>&emsp;  • Estado<br>&emsp;  • Dirección<br>&emsp;  • Metodo de pago*<br>&emsp;  • Tags Generador<br>&emsp;  • Id legal Generador = RFC*<br>&emsp;  • Kilos (netos/brutos)<br>&emsp;  • Precio", consid: "", res: "• Dataset base de recolecciones" },
-            { step: "2", title: "Validación operativa (Filtro de registros)", actor: "Administración", desc: "• Filtrar registros con estado válido para pago:<br>&emsp;  o Completado<br>&emsp;  o Verificado<br>• Validar:<br>&emsp;  o Integridad de datos (RFC, kilos, precio)<br>&emsp;  o No duplicidad de registros", consid: "• Las inconsistencias no bloquean el pago, pero deben registrarse como incidencias, darles seguimiento y corregirse en un flujo paralelo. Solo aquellas que afecten directamente el monto (kilos o precio) deberán resolverse antes del cálculo.", res: "• Registros válidos para procesamiento de pago" },
-            { step: "3", title: "Consolidación de información", actor: "Administración", desc: "• Agrupar información por:<br>&emsp;  o Cliente<br>&emsp;  o Periodo (día / semana / quincena)<br>• Aplicar reglas:<br>&emsp;  o Monto mínimo ($500)<br>&emsp;  o Exclusión de registros inválidos", consid: "", res: "• Base consolidada por cliente y periodo" },
-            { step: "4", title: "Cálculo de pagos", actor: "Administración", desc: "• Calcular monto por cliente:<br>&emsp;  o Kilos x Precio (según contrato)<br>• Validar:<br>&emsp;  o Consistencia de kilos (MUTA vs sistema actual)<br>&emsp;  o Precio vigente<br>• Herramientas de validación IA (Prompt)<br><br>Exclusiones:<br>• Penalizaciones (se gestionan en subproceso independiente)", consid: "", res: "• Monto total a pagar por cliente" },
-            { step: "5", title: "Generación de Orden de Pago", actor: "Administración", desc: "• Generar documento orden de pago estándar que incluye:<br>&emsp;  o Cliente<br>&emsp;  o Periodo<br>&emsp;  o Kilos<br>&emsp;  o Monto total<br>&emsp;  o Referencia de recolecciones<br>• Enviar orden de pago al cliente<br>• Solicita factura", consid: "", res: "• Orden de pago enviada" },
-            { step: "6", title: "Facturación (Cliente)", actor: "Cliente", desc: "• Recibir orden de pago<br>• Emitir factura<br>• Enviar factura", consid: "", res: "Factura emitida y enviada por el cliente, alineada con la orden de pago generada" },
-            { step: "7", title: "Recepción y validación de factura", actor: "Administración", desc: "• Recepción de factura por parte del cliente<br>• Validación de:<br>&emsp;  o RFC correcto<br>&emsp;  o Monto coincidente<br>&emsp;  o Datos fiscales completos<br><br>Regla crítica:<br>• Sin factura → NO se procesa el pago<br>• Factura incorrecta → rechazo<br>• Factura válida → continuar con el proceso", consid: "", res: "• Factura validada y autorizada" },
-            { step: "8", title: "Aprobación financiera", actor: "Administración / Tesorería", desc: "• Nivel 1: Administración<br>&emsp;  o Validación final de:<br>&emsp;&emsp;    ▪ Cálculo<br>&emsp;&emsp;    ▪ Orden de pago<br>&emsp;&emsp;    ▪ Factura<br>• Nivel 2: Tesorería<br>&emsp;  o Validación de:<br>&emsp&emsp;;    ▪ Disponibilidad de fondos<br><br>Decisión:<br>• Rechazado → Corrección / Aplazamiento: El pago puede ser rechazado por errores en cálculo, factura o información, en cuyo caso se corrige y revalida. También puede aplazarse por causas operativas como falta de fondos o factura pendiente, sin reiniciar el proceso.<br>• Aprobado → ejecución", consid: "", res: "• Pago autorizado" },
-            { step: "9", title: "Ejecución del pago", actor: "Tesorería", desc: "• Realizar transferencia (SPEI / bancaria)<br>• Registrar:<br>&emsp;  o Referencia bancaria<br>&emsp;  o Fecha de pago<br>&emsp;  o Monto pagado", consid: "", res: "• Pago ejecutado" },
-            { step: "10", title: "Notificación al cliente", actor: "Administración", desc: "• Enviar confirmación de pago:<br>&emsp;  o Comprobante<br>&emsp;  o Detalle del pago", consid: "", res: "• Cliente notificado" },
-            { step: "11", title: "Registro y conciliación", actor: "Administración / Finanzas", desc: "• Registro contable del pago<br>• Conciliación bancaria<br>• Cierre del periodo", consid: "", res: "• Proceso cerrado y conciliado" }
-        ],
-        subprocesos: [
-            { title: "Subproceso relacionado “Gestión de Penalizaciones”", desc: "• Se gestiona fuera del flujo principal\n• No bloquea pagos\n• Puede afectar ajustes posteriores o compensaciones\n• Penalizaciones a Clientes se aplican cuando el cliente incumple condiciones acordadas, por ejemplo:\n  o Entrega de material fuera de especificación (contaminación, mezcla indebida)\n  o Diferencias relevantes entre volumen reportado vs recibido\n  o Incumplimiento de condiciones logísticas (accesos, tiempos, preparación)\n  o Visitas en cero\n  o Retrasos en servicio\n  o Falta de cumplimiento en procesos administrativos (ej. retraso en facturación, si se decide aplicar)\n  ▪ Impacto:\n    • Ajuste en el monto a pagar (reducción)\n    • Registro como incidencia contractual\n• Penalizaciones a Proveedores, se aplican cuando la operación interna o proveedores incumplen estándares definidos, por ejemplos:\n  o Registro incorrecto de datos (kilos, dirección, cliente)\n  o Retrasos operativos\n  ▪ Impacto:\n    • Puede generar:\n      o Ajustes internos\n      o Evaluación de desempeño\n      o Penalización económica interna (si aplica)" },
-            { title: "Subproceso Relacionado “Soporte TI”", desc: "• Soporte a incidencias operativas, se atienden problemas relacionados con el uso del sistema en la operación diaria, por ejemplo:\n  o Error en la descarga de reportes de MUTA\n  o Fallas en accesos o permisos de usuarios\n  o Problemas en visualización de información (precios, kilos, estados)\n• Soporte a calidad de datos, se enfoca en la corrección y validación de información utilizada en pagos, por ejemplo:\n  o Corrección de direcciones incorrectas\n  o Ajustes en registros duplicados\n• Soporte evolutivo (mejoras al sistema), se enfoca en la evolución del sistema para mejorar el proceso, por ejemplo:\n  o Incorporación de nuevos campos requeridos\n  o Ajustes en reportes de MUTA" }
-        ],
-        reglas: [
-            "Validación de información<br>• Integridad de datos obligatoria, todo registro de recolección debe contar con:<br>&emsp;   o RFC del cliente<br>&emsp;   o Kilos<br>&emsp;   o Precio<br>&emsp;   o Estado válido<br>• Estados válidos para pago, solo se procesan registros con estado:<br>&emsp;   o Verificado<br>• No se permiten procesar registros duplicados:<br>&emsp;   o Variables:<br>&emsp;&emsp;      ▪ ID_Recolección<br>&emsp;&emsp;      ▪ Fecha_Recolección<br>&emsp;&emsp;      ▪ Cliente<br>&emsp;   o Clave única sugerida:<br>    ID_Recolección + Fecha_Recolección + Cliente<br>• MUTA es la única fuente de datos operativos para el pago.<br>• Manejo de inconsistencias, las inconsistencias:<br>&emsp;   o No bloquean el flujo<br>&emsp;   o Se registran como incidencias<br>&emsp;   o Excepción:<br>&emsp;     Si afectan el monto (kilos o precio) → deben corregirse antes del cálculo",
-            "Cálculo de pagos<br>• La base para el cálculo es sobre los Kilos Netos<br>• El monto se calcula de la siguiente manera:<br>• Fórmula:<br>  Monto_Pago = Kilos_Netos × Precio_Contrato<br>• El precio por kilo debe estar definido en el contrato y debe de coincidir con el registro en MUTA.<br>• Las penalizaciones no afectan el cálculo inicial y se gestionan en un subproceso independiente llamado “Gestión de Penalizaciones”",
-            "Reglas financieras<br>• Pagos menores a $500 no se procesan y se acumulan.<br>  Regla:<br>&emsp;   o Si Monto_Pago < Monto_Mínimo → se acumula<br>&emsp;   o Si Monto_Pago ≥ Monto_Mínimo → se paga<br>• Los pagos solo se ejecutan en periodos definidos:<br>&emsp;   o Principios de mes<br>&emsp;   o Finales de mes<br>• Todo pago debe contar con un folio único.",
-            "Facturación<br>• No se puede ejecutar un pago sin factura válida.<br>• La factura debe pasar por una validación fiscal considerando las siguientes variables:<br>&emsp;   o RFC_Factura<br>&emsp;   o Monto_Factura<br>&emsp;   o Datos_Fiscales<br>&emsp;   o Debe cumplir:<br>&emsp; &emsp;     ▪ RFC correcto<br>&emsp; &emsp;     ▪ Monto coincide con orden<br>&emsp; &emsp;     ▪ Datos completos<br>• El monto de la factura debe coincidir con la orden de pago.<br>  Regla:<br>  Monto_Factura = Monto_Orden_Pago",
-            "Operación y control<br>• Las evidencias son obligatorias en MUTA, pero no bloquean el pago:<br>&emsp;   o Foto<br>&emsp;   o Firma<br>&emsp;   o Nombre<br>• Las inconsistencias deben registrarse, clasificarse y tener seguimiento, pero sin detener el proceso.<br>• Todo cambio en datos (precio, kilos, cliente) debe quedar registrado en un historial<br>• Debe existir separación de funciones entre validación (Administración) y ejecución (Tesorería).<br>• Todo pago debe quedar registrado en el sistema, incluyendo su estado: realizado, pendiente o acumulado para periodos posteriores.<br>• No se puede ejecutar un pago si no se cumple:<br>  o Validación → Cálculo → Factura → Aprobación",
-            "Reglas de penalizaciones<br>• Las penalizaciones se establecen en contrato y pueden ser aplicables considerando los siguientes pasos:<br>&emsp;   o Visitas en cero<br>&emsp;   o Retrasos en servicio<br>&emsp;   o Incumplimientos operativos"
-        ],
-        kpis: [
-            { cat: "Tiempo / Eficiencia", nombre: "Tiempo total de ciclo de pago", formula: "Fecha pago – Fecha extracción", interpretacion: "Menor tiempo = mayor eficiencia" },
-            { cat: "Tiempo / Eficiencia", nombre: "Tiempo de espera de factura", formula: "Fecha factura – Fecha orden", interpretacion: "Alto = retraso del cliente" },
-            { cat: "Efectividad del proceso", nombre: "% de pagos en tiempo", formula: "(Pagos en tiempo / Total) × 100", interpretacion: "<80% indica problemas" },
-            { cat: "Calidad del proceso", nombre: "% de pagos con errores", formula: "(Pagos con error / Total) × 100", interpretacion: "Ideal <5%" },
-            { cat: "Financiero", nombre: "Monto total pagado", formula: "Σ pagos", interpretacion: "Control financiero" },
-            { cat: "Financiero", nombre: "Costo por kilo", formula: "Total pagado / Total kilos", interpretacion: "Base para margen" },
-            { cat: "Calidad de datos", nombre: "% registros con inconsistencias", formula: "(Registros con error / Total) × 100", interpretacion: "Alto = problema operativo" },
-            { cat: "Facturación / Cliente", nombre: "% facturas a tiempo", formula: "(Facturas a tiempo / Total) × 100", interpretacion: "Bajo = retrasos externos" },
-            { cat: "Financiero / Control", nombre: "Monto acumulado (<$500)", formula: "Σ pagos menores a $500", interpretacion: "Alto = muchos pagos pequeños" },
-            { cat: "Cumplimiento / Control", nombre: "% pagos sin factura", formula: "(Pagos sin factura / Total) × 100", interpretacion: "Debe ser 0%" },
-            { cat: "Control financiero", nombre: "% pagos conciliados", formula: "(Pagos conciliados / Total) × 100", interpretacion: "Cercano a 100%" }
-        ],
-        roles: [
-            { rol: "Logística y Recolección", resp: "Validar la información operativa en campo", act: "- Registrar recolecciones en MUTA\n- Capturar kilos (netos/brutos)\n- Adjuntar evidencias (foto, firma, nombre)\n- Validar dirección y ejecución del servicio\n- Detectar incidencias (visitas en cero, retrasos)", etapa: "0. Validación operativa" },
-            { rol: "Administración (Back Office / Pagos)", resp: "Gestionar el proceso completo de pagos (rol core)", act: "- Descargar datos de MUTA\n- Validar información (RFC, kilos, precio, estado) - Eliminar duplicados\n- Registrar incidencias\n- Consolidar información por cliente/periodo\n- Aplicar reglas (mínimo $500) - Calcular pagos (kilos netos × precio)\n- Generar orden de pago\n- Enviar orden y solicitar factura - Validar factura\n- Gestionar correcciones\n- Notificar al cliente", etapa: "1. Extracción\n2. Validación administrativa\n3. Consolidación\n4. Cálculo\n5. Orden de pago\n7. Validación de factura\n8. Aprobación (Nivel 1)\n9. Notificación" },
-            { rol: "Cliente (Generador)", resp: "Emitir factura y recibir pago", act: "- Recibir orden de pago\n- Generar factura\n- Enviar factura a Sonne\n- Atender correcciones si aplica\n- Confirmar recepción del pago", etapa: "6. Facturación\n7. Corrección de factura\n9. Recepción de notificación" }, 
-            { rol: "Tesorería", resp: "Validar y ejecutar el pago", act: "- Validar disponibilidad de fondos\n- Aprobar pago (nivel 2)\n- Ejecutar transferencia bancaria\n- Registrar referencia de pago\n- Reprogramar pagos si no hay fondos", etapa: "8. Aprobación (Nivel 2)\n9. Ejecución del pago" },
-            { rol: "Contabilidad / Finanzas", resp: "Registrar y conciliar los pagos", act: "- Registrar pago en sistema contable\n- Conciliar contra banco\n- Validar cierre de periodo\n- Generar reportes financieros", etapa: "10. Registro y conciliación" },
-            { rol: "(Soporte TI)", resp: "Garantizar disponibilidad, calidad de datos y soporte técnico", act: "- Soporte a incidencias en MUTA\n- Validar y corregir datos (kilos, direcciones, precios)\n- Ajustar reportes o campos\n- Soporte en automatización (IA, integraciones)\n- Mantener trazabilidad de cambios", etapa: "Transversal (todas las etapas)" },
-            { rol: "Administración (Control / Auditoría interna)", resp: "Control y trazabilidad del proceso", act: "- Mantener bitácora de pagos (realizados / pendientes)\n- Mantener bitácora de cambios (precios, kilos, clientes)\n- Validar cumplimiento de reglas\n- Seguimiento a incidencias", etapa: "Transversal (control del proceso)" }
-        ],
-        riesgos: [
-            { riesgo: "Pago incorrecto", causa: "Error en cálculo o datos inconsistentes", impacto: "Alto", prob: "Media", sev: "Alta", control: "Validación de cálculo (kilos netos × precio), revisión en aprobación Nivel 1", tipo: "Preventivo / Detectivo", etapa: "Cálculo / Aprobación", resp: "Administración" },
-            { riesgo: "Pago sin factura", causa: "Omisión en validación", impacto: "Alto", prob: "Baja", sev: "Alta", control: "Regla: pago no procede sin factura válida", tipo: "Preventivo", etapa: "Validación de factura", resp: "Administración" },
-            { riesgo: "Duplicidad de pago", causa: "Datos inconsistentes", impacto: "Se paga más de una vez la misma recolección", prob: "Media", sev: "Alta", control: "Validación de duplicidad (ID + fecha + cliente)", tipo: "Preventivo", etapa: "Validación administrativa", resp: "Administración" },
-            { riesgo: "Error en kilos (netos)", causa: "Datos erróneos (kilos, precio, cliente)", impacto: "Uso incorrecto de kilos netos afecta pago", prob: "Media", sev: "Alta", control: "Registro de incidencias + validación previa al cálculo", tipo: "Detectivo", etapa: "Cálculo", resp: "Administración" },
-            { riesgo: "Falta de evidencias", causa: "Recolección sin respaldo visual", impacto: "Falta de control en campo", prob: "Media", sev: "Media", control: "Candado en MUTA (evidencias obligatorias)", tipo: "Preventivo", etapa: "Validación operativa", resp: "Logística" },
-            { riesgo: "Pago fuera de periodo", causa: "Pago fuera de fechas definidas", impacto: "Falta de control de periodos", prob: "Baja", sev: "Media", control: "Validación de periodo antes de aprobación", tipo: "Preventivo", etapa: "Consolidación / Aprobación", resp: "Administración" },
-            { riesgo: "Pago sin aprobación", causa: "Se ejecuta pago sin validación interna", impacto: "Falta de control de flujo", prob: "Media", sev: "Alta", control: "Aprobación en 2 niveles (Administración / Tesorería)", tipo: "Preventivo", etapa: "Aprobación", resp: "Administración / Tesorería" },
-            { riesgo: "Falta de fondos", causa: "No hay liquidez para ejecutar pagos", impacto: "Mala planeación financiera", prob: "Media", sev: "Alta", control: "Validación de disponibilidad en Tesorería", tipo: "Preventivo", etapa: "Aprobación Nivel 2", resp: "Tesorería" },
-            { riesgo: "Retraso en facturación", causa: "Cliente no envía factura a tiempo", impacto: "Dependencia externa", prob: "Media", sev: "Alta", control: "Seguimiento a cliente + control de tiempos", tipo: "Detectivo", etapa: "Facturación", resp: "Administración" },
-            { riesgo: "Factura incorrecta", causa: "Factura con errores fiscales", impacto: "Error del cliente", prob: "Media", sev: "Media", control: "Validación de factura (RFC, monto, datos)", tipo: "Detectivo", etapa: "Validación de factura", resp: "Administración" },
-            { riesgo: "Datos bancarios incorrectos", causa: "Transferencia a cuenta errónea", impacto: "Falta de control de datos bancarios", prob: "Media", sev: "Media", control: "Validación en fuente externa (Excel controlado)", tipo: "Preventivo", etapa: "Ejecución del pago", resp: "Tesorería" },
-            { riesgo: "Incidencias no atendidas", causa: "Errores no corregidos", impacto: "Falta de seguimiento", prob: "Media", sev: "Media", control: "Registro y seguimiento de incidencias", tipo: "Detectivo", etapa: "Validación administrativa", resp: "Administración" },
-            { riesgo: "Penalizaciones mal aplicadas", causa: "Ajustes incorrectos al cliente/proveedor", impacto: "Falta de reglas claras", prob: "Media", sev: "Media", control: "Definición contractual + validación previa", tipo: "Preventivo", etapa: "Subproceso penalizaciones", resp: "Administración" },
-            { riesgo: "Visitas en cero no controladas", causa: "Costos logísticos sin control", impacto: "Falta de registro", prob: "Media", sev: "Media", control: "Registro de incidencias + control contractual", tipo: "Detectivo", etapa: "Operación / Penalizaciones", resp: "Logística / Administración" },
-            { riesgo: "Error en conciliación", causa: "Diferencias con banco", impacto: "Registro incorrecto", prob: "Media", sev: "Alta", control: "Conciliación bancaria obligatoria", tipo: "Detectivo", etapa: "Conciliación", resp: "Finanzas" }
-        ],
-        diagrama: {
-            url: "https://www.figma.com/board/LcHyLrp5TAAwHA8NlENxst/Procesos-Bloque-1--Compras--Almacen--Mantenimiento-?node-id=409-124",
-            img: "img/image.png", 
-            text: "Ver diagrama completo de Pagos "
-        }
+    contexto: {
+        icon: `🌐`,
+        title: `Gestión de Pagos`,
+        objetivo: `Garantizar la ejecución correcta, oportuna y controlada de los pagos, asegurando la validación de la información operativa, el cumplimiento de condiciones comerciales y fiscales, y la trazabilidad completa de cada transacción.`,
+        alcance: `El proceso de Gestión de Pagos TO-BE abarca la administración integral de los pagos a través de tres flujos operativos diferenciados:
+<br> • <b>Flujo A:</b> Pagos a clientes/proveedores de recolección, basados en información operativa proveniente de MUTA, considerando agrupaciones fiscales, ciclos de facturación, donaciones y penalizaciones.  
+<br> • <b>Flujo B:</b>  Pagos derivados de compras comerciales a proveedores externos, incluyendo negociación, validación de calidad, recepción de material y control de excepciones como pagos sin factura.  
+<br> • <b>Flujo C:</b>  Pagos a proveedores de refacciones, insumos y servicios, integrados al proceso de compras mediante validaciones estructuradas (orden de compra, recepción y factura).  
+<br> El alcance incluye desde la validación del origen del pago en cada flujo, pasando por la consolidación, cálculo, documentación y aprobación financiera, hasta la ejecución del pago, registro contable y conciliación, bajo un esquema unificado de control y trazabilidad.`
     },
-    compras: {
-        contexto: {
-            icon: "🛒",
-            title: "Gestión de Compras",
-            objetivo: "Optimizar el proceso de compras mediante automatización, control presupuestal y trazabilidad en tiempo real, garantizando eficiencia operativa, reducción de costos y cumplimiento normativo.",
-            alcance: "El proceso de Gestión de Compras abarca desde la identificación de la necesidad hasta el pago al proveedor y la evaluación de su desempeño, incluyendo la solicitud de compra, validación presupuestal, aprobaciones, cotización, selección de proveedor, generación de orden de compra, recepción de bienes o servicios, validación documental y ejecución de pago. El proceso se ejecuta de forma digital, con controles financieros, trazabilidad completa y separación de funciones entre Finanzas, Compras y Tesorería."
-        },
-        proceso: [
-            { step: "1", title: "Detección de necesidad", actor: "Solicitante / Sistema", desc: "• La necesidad puede originarse por:<br>&emsp;  o Requerimiento operativo (usuario)<br>&emsp;  o Stock mínimo (inventario)<br>&emsp;  o Mantenimiento programado (operaciones / MUTA)<br>• El sistema puede sugerir:<br>&emsp;  o Proveedores frecuentes<br>&emsp;  o Precios históricos<br>&emsp;  o Tiempos de entrega", consid: "", res: "• Requerimiento identificado y listo para formalización" },
-            { step: "2", title: "Creación de Solicitud de Compra (SC)", actor: "Solicitante", desc: "• Captura en sistema con campos obligatorios:<br>&emsp;  o Tipo de compra (operativa, CAPEX, mantenimiento)<br>&emsp;  o Centro de costo<br>&emsp;  o Cantidad y descripción<br>&emsp;  o Fecha requerida<br>&emsp;  o Justificación del requerimiento<br>• Validaciones automáticas:<br>&emsp;  o Catálogo de productos/servicios<br>&emsp;  o Campos obligatorios completos", consid: "", res: "• Solicitud de Compra registrada (estatus: “Pendiente validación”)" },
-            { step: "3", title: "Validación Presupuestal", actor: "Finanzas", desc: "• Validación de:<br>&emsp;  o Disponibilidad presupuestal<br>&emsp;  o Partida contable<br>&emsp;  o Centro de costo<br>• Posibles escenarios:<br>&emsp;  o Aprobado → se asigna presupuesto<br>&emsp;  o Rechazado → regresa a solicitante<br>&emsp;  o Ajuste → modificación de monto o alcance", consid: "", res: "• SC aprobada con presupuesto asignado" },
-            { step: "4", title: "Flujo de Aprobación", actor: "Sistema + Aprobador", desc: "• Flujo automático basado en:<br>&emsp;  o Monto de compra<br>&emsp;  o Tipo de compra<br>&emsp;  o Área<br>• Niveles de aprobación configurables:<br>&emsp;  o Jefe directo<br>&emsp;  o Gerencia<br>&emsp;  o Dirección<br>• Notificaciones automáticas", consid: "", res: "• SC aprobada / rechazada" },
-            { step: "5", title: "Proceso de Cotización", actor: "Compras", desc: "• Envío de solicitudes de cotización a proveedores<br>• Recepción de propuestas en sistema<br>• Comparación automática:<br>&emsp;  o Precio<br>&emsp;  o Tiempo de entrega<br>&emsp;  o Condiciones comerciales<br>&emsp;  o Score histórico del proveedo", consid: "", res: "• Cuadro comparativo de cotizaciones" },
-            { step: "6", title: "Selección de Proveedor", actor: "Compras", desc: "• Análisis de propuestas<br>• Selección del proveedor óptimo (costo-beneficio)<br>• Regla clave:<br>&emsp;  o Si no se selecciona la mejor opción → justificar en sistema<br>• Registro de decisión", consid: "", res: "• Proveedor seleccionado" },
-            { step: "7", title: "Generación de Orden de Compra (OC)", actor: "Sistema + Compras", desc: "• Generación automática de OC basada en SC aprobada<br>• Inclusión de:<br>&emsp;  o Datos del proveedor<br>&emsp;  o Condiciones de pago<br>&emsp;  o Fecha de entrega<br>• Envío automático al proveedor", consid: "", res: "• OC emitida y enviada" },
-            { step: "8", title: "Recepción de Bienes/Servicios", actor: "Almacén / Operaciones", desc: "• Recepción física o validación del servicio<br>• Comparación contra OC:<br>&emsp;  o Cantidad<br>&emsp;  o Calidad<br>• Registro de evidencia:<br>&emsp;  o Fotos<br>&emsp;  o Firma<br>&emsp;  o Documentos<br>• Manejo de incidencias:<br>&emsp;  o Rechazo parcial o total", consid: "", res: "• Recepción registrada (Aceptada / Rechazada)" },
-            { step: "9", title: "Validación de Factura", actor: "Sistema + Compras", desc: "• Validación automática:<br>&emsp;  o Orden de compra (OC)<br>&emsp;  o Recepción<br>&emsp;  o Factura<br>• Escenarios:<br>&emsp;  o Coincide → pasa a pago<br>&emsp;  o No coincide → bloqueo + incidencia", consid: "", res: "• Factura validada" },
-            { step: "10", title: "Ejecución de Pago", actor: "Tesorería", desc: "• Programación de pago según:<br>&emsp;  o Condiciones acordadas<br>&emsp;  o Flujo de caja<br>• Ejecución del pago<br>• Registro en sistema<br>• Notificación al proveedo", consid: "", res: "• Pago realizado" }
-        ],
-        subprocesos: [],
-        reglas: [
-            "• No existe orden de compra (OC) sin solicitud de compra (SC) aprobada",
-            "• Toda solicitud debe contar con validación de presupuesto (Finanzas)",
-            "• El sistema verifica disponibilidad antes de aprobar",
-            "• Si excede el presupuesto:<br>&emsp;  o Se bloquea el flujo<br>&emsp;  o Se notifica al responsable<br>&emsp;  o Se requiere autorización o rechazo",
-            "• Toda excepción debe incluir justificación",
-            "• Se registra en bitácora:<br>&emsp;  o Validación realizada<br>&emsp;  o Excepciones autorizadas o rechazadas<br>&emsp;  o Usuario, fecha y motivo",
-            "• La SC no podrá ser creada si faltan campos requeridos.<br>&emsp;  o Variables:<br>&emsp;&emsp;    ▪ tipo_compra (Operativa, Mantenimiento, etc)<br> &emsp;&emsp;   ▪ centro_costo<br>&emsp;&emsp;    ▪ descripcion<br>&emsp;&emsp;    ▪ cantidad<br>&emsp;&emsp;    ▪ fecha_requerida<br>&emsp;&emsp;    ▪ justificacion",
-            "• Mínimo 2 cotizaciones (salvo excepción)",
-            "• Justificación obligatoria en decisiones de compra",
-            "• No se ejecuta pago sin:<br>&emsp;  o OC válida<br>&emsp;  o Recepción validada<br>&emsp;  o Factura correcta",
-            "• Al seleccionar al proveedor, se debe evaluar la mejor opción costo-beneficio.<br>&emsp;  o Variables:<br>&emsp;&emsp;    ▪ precio<br>&emsp;&emsp;    ▪ tiempo_entrega<br>&emsp;&emsp;    ▪ score_proveedor",
-            "• Si no se elige la mejor opción, se debe justificar."
-        ],
-        kpis: [
-            { cat: "Eficiencia del proceso", nombre: "Tiempo total de compra", formula: "Fecha pago – Fecha solicitud", interpretacion: "Menor tiempo = mayor eficiencia" },
-            { cat: "Eficiencia del proceso", nombre: "Tiempo de aprobación", formula: "Fecha aprobación – Fecha solicitud", interpretacion: "Alto = cuellos de botella" },
-            { cat: "Eficiencia del proceso", nombre: "Tiempo generación OC", formula: "Fecha OC – Fecha aprobación", interpretacion: "Mide eficiencia de Compras" },
-            { cat: "Eficiencia del proceso", nombre: "Tiempo de pago", formula: "Fecha pago – Fecha factura validada", interpretacion: "Impacta relación con proveedor" },
-            { cat: "Control del dinero", nombre: "% compras dentro de presupuesto", formula: "(Compras dentro / total) ×100", interpretacion: "Alto = buen control financiero" },
-            { cat: "Control del dinero", nombre: "% desviación presupuestal", formula: "(Gasto real – presupuesto) / presupuesto ×100", interpretacion: "Alto = sobrecostos" },
-            { cat: "Control del dinero", nombre: "Ahorro en compras", formula: "(Precio estimado – real) / estimado ×100", interpretacion: "Alto = buena negociación" },
-            { cat: "Control del dinero", nombre: "% compras con excepción", formula: "(Compras excepción / total) ×100", interpretacion: "Alto = riesgo de malas decisiones" },
-            { cat: "Gestión de compras", nombre: "% compras con RFQ", formula: "(Compras con RFQ / total) ×100", interpretacion: "Alto = mayor control" },
-            { cat: "Gestión de compras", nombre: "Tiempo selección proveedor", formula: "Fecha selección – fecha cotización", interpretacion: "Bajo = eficiencia" },
-            { cat: "Gestión de compras", nombre: "% cumplimiento proceso", formula: "(Compras correctas / total) ×100", interpretacion: "Bajo = riesgo de auditoría" },
-            { cat: "Entregas y operación", nombre: "% entregas a tiempo", formula: "(Entregas a tiempo / total) ×100", interpretacion: "Bajo = proveedor deficiente" },
-            { cat: "Entregas y operación", nombre: "% entregas sin error", formula: "(Entregas correctas / total) ×100", interpretacion: "Bajo = problemas operativos" },
-            { cat: "Entregas y operación", nombre: "% incidencias", formula: "(Recepciones con error / total) ×100", interpretacion: "Alto = fallas operativas" },
-            { cat: "Pagos (Tesorería)", nombre: "% pagos a tiempo", formula: "(Pagos a tiempo / total) ×100", interpretacion: "Alto = buena tesorería" },
-            { cat: "Pagos (Tesorería)", nombre: "Tiempo promedio de pago", formula: "Promedio (Fecha pago – factura)", interpretacion: "Bajo = buena liquidez" },
-            { cat: "Pagos (Tesorería)", nombre: "% pagos con error", formula: "(Pagos con error / total) ×100", interpretacion: "Alto = riesgo financiero" },
-            { cat: "Control y cumplimiento", nombre: "% compras fuera del proceso", formula: "(Compras fuera / total) ×100", interpretacion: "Alto = riesgo de fraude" },
-            { cat: "Control y cumplimiento", nombre: "% compras urgentes", formula: "(Compras urgentes / total) ×100", interpretacion: "Alto = mala planeación" },
-            { cat: "Control y cumplimiento", nombre: "% cumplimiento", formula: "(Pagos validados / total) ×100", interpretacion: "Bajo = riesgo de pago indebido" },
-            { cat: "Proveedores", nombre: "Calificación de proveedores", formula: "Promedio (calidad + tiempo + cumplimiento)", interpretacion: "Bajo = proveedor riesgoso" },
-            { cat: "Proveedores", nombre: "% proveedores evaluados", formula: "(Evaluados / total) ×100", interpretacion: "Bajo = falta de seguimiento" },
-            { cat: "Operación", nombre: "Indicador de compras (volumen)", formula: "Total SC/OC en periodo", interpretacion: "Mide carga operativa" },
-            { cat: "Operación", nombre: "Tiempo por solicitud", formula: "Promedio (Fecha fin – inicio)", interpretacion: "Mide eficiencia por caso" }
-        ],
-        roles: [
-            { rol: "Solicitante (Área operativa / usuario interno)", resp: "Identificar y registrar necesidades de compra", act: "- Detectar necesidad (manual o automática)\n- Crear solicitud de compra (SC)\n- Definir requerimientos (cantidad, tipo, urgencia)\n- Dar seguimiento a su solicitud", etapa: "1. Detección de necesidad\n2. Creación de SC" },
-            { rol: "Sistema / Workflow (ERP / Plataforma)", resp: "Automatizar, validar y orquestar el proceso", act: "- Validar datos y catálogos\n- Ejecutar workflow de aprobación\n- Integrar validación presupuestal\n- Enviar RFQs automáticos\n- Generar OC automática\n- Ejecutar validación\n- Registrar bitácora y trazabilidad\n- Generar KPIs", etapa: "2. Validación SC\n3. Flujo de aprobación\n5. Cotización\n7. Generación OC\n9. Validación factura\n11. Analítica" },
-            { rol: "Finanzas", resp: "Asignar y controlar el presupuesto", act: "- Validar disponibilidad presupuestal\n- Asignar partida / centro de costo\n- Autorizar uso de presupuesto\n- Monitorear consumo vs presupuesto", etapa: "3. Validación presupuestal" },
-            { rol: "Aprobador (Gerente / Dirección)", resp: "Autorizar solicitudes de compra", act: "- Revisar solicitud de compra-\n- Aprobar / rechazar / solicitar ajustes\n- Validar alineación operativa", etapa: "4. Aprobación de SC" },
-            { rol: "Compras", resp: "Administrar el gasto y gestionar proveedores", act: "- Gestionar cotizaciones (RFQ)\n- Analizar propuestas\n- Comparar condiciones (precio, tiempo, calidad)\n- Seleccionar proveedor\n- Justificar decisiones\n- Generar y validar OC\n- Asegurar optimización del gasto", etapa: "5. Cotización\n6. Selección de proveedor\n7. Generación de OC" },
-            { rol: "Proveedor", resp: "Suministrar bienes o servicios", act: "- Recibir RFQ- Enviar cotización\n- Recibir OC\n- Entregar bienes/servicios\n- Enviar factura", etapa: "5. Cotización\n7. Recepción OC\n8. Entrega\n9. Facturación" },
-            { rol: "Almacén / Operaciones", resp: "Validar recepción de bienes o ejecución de servicios", act: "- Recibir productos/servicios\n- Validar contra OC (cantidad/calidad)\n- Registrar evidencia (firma, fotos, documentos)\n- Reportar incidencias o rechazos", etapa: "8. Recepción de bienes/servicios" },
-            { rol: "Tesorería", resp: "Ejecutar pagos y gestionar flujo de efectivo", act: "- Programar pagos según condiciones\n- Ejecutar pagos a proveedores\n- Gestionar flujo de caja\n- Registrar ejecución de pago", etapa: "10. Ejecución de pago" },
-            { rol: "Sistema BI / Analítica", resp: "Generar información para toma de decisiones", act: "- Medir KPIs del proceso\n- Evaluar desempeño de proveedores\n- Generar dashboards\n- Detectar desviaciones y oportunidades", etapa: "11. Evaluación y analítica" },
-            { rol: "Auditoría / Control Interno (recomendado)", resp: "Supervisar cumplimiento y control del proceso", act: "- Validar trazabilidad\n- Auditar cumplimiento de políticas\n- Revisar excepciones (compras urgentes, proveedor único)\n- Asegurar separación de funciones", etapa: "Transversal (todo el proceso)" }
-        ],
-        riesgos: [
-            { riesgo: "Compra sin necesidad real", causa: "Falta de validación del requerimiento", impacto: "Gasto innecesario", prob: "Baja", sev: "Media", control: "Justificación obligatoria en SC + aprobación", tipo: "Preventivo", etapa: "SC", resp: "Aprobador" },
-            { riesgo: "Compra sin presupuesto", causa: "No validación financiera", impacto: "Sobregasto", prob: "Baja", sev: "Alta", control: "Validación presupuestal obligatoria", tipo: "Preventivo", etapa: "SC", resp: "Finanzas" },
-            { riesgo: "Sobregasto no controlado", causa: "Exceso de compras acumuladas", impacto: "Desviación financiera", prob: "Media", sev: "Alta", control: "Control de presupuesto en tiempo real + alertas", tipo: "Preventivo", etapa: "SC", resp: "Finanzas" },
-            { riesgo: "Aprobaciones indebidas", causa: "Falta de control en roles", impacto: "Fraude", prob: "Baja", sev: "Alta", control: "Workflow automatizado + jerarquías", tipo: "Preventivo", etapa: "Aprobación", resp: "Sistema" },
-            { riesgo: "Falta de segregación de funciones", causa: "Mismo usuario controla todo", impacto: "Riesgo de fraude", prob: "Baja", sev: "Crítica", control: "Separación: Finanzas ≠ Compras ≠ Tesorería", tipo: "Preventivo", etapa: "Roles", resp: "Dirección" },
-            { riesgo: "Selección de proveedor inadecuado", causa: "Falta de comparativa", impacto: "Sobreprecio / mala calidad", prob: "Media", sev: "Alta", control: "Mínimo 2 cotizaciones (RFQ)", tipo: "Preventivo", etapa: "Cotización", resp: "Compras" },
-            { riesgo: "Favoritismo a proveedores", causa: "Falta de transparencia", impacto: "Corrupción", prob: "Baja", sev: "Crítica", control: "Justificación obligatoria de selección", tipo: "Detectivo", etapa: "Selección", resp: "Compras / Auditoría" },
-            { riesgo: "Error en Orden de Compra", causa: "Datos incorrectos", impacto: "Retrasos / pagos erróneos", prob: "Media", sev: "Media", control: "Generación automática de OC", tipo: "Preventivo", etapa: "OC", resp: "Sistema" },
-            { riesgo: "Recepción incorrecta", causa: "No validación contra OC", impacto: "Pérdida económica", prob: "Media", sev: "Alta", control: "Validación física vs OC + evidencia", tipo: "Preventivo", etapa: "Recepción", resp: "Almacén" },
-            { riesgo: "Recepción no registrada", causa: "Omisión del proceso", impacto: "Falta de trazabilidad", prob: "Baja", sev: "Alta", control: "Registro obligatorio en sistema", tipo: "Preventivo", etapa: "Recepción", resp: "Sistema" },
-            { riesgo: "Pago sin validación", causa: "Falta de control documental", impacto: "Fraude / pago indebido", prob: "Baja", sev: "Crítica", control: "Validación 3-way match", tipo: "Preventivo", etapa: "Factura", resp: "Sistema" },
-            { riesgo: "Factura duplicada", causa: "Falta de control", impacto: "Pago duplicado", prob: "Baja", sev: "Alta", control: "Validación de folio único", tipo: "Preventivo", etapa: "Pago", resp: "Sistema / Tesorería" },
-            { riesgo: "Pago fuera de condiciones", causa: "Mala programación", impacto: "Problemas de flujo de caja", prob: "Media", sev: "Alta", control: "Programación automática de pagos", tipo: "Preventivo", etapa: "Pago", resp: "Tesorería" },
-            { riesgo: "Pagos incorrectos", causa: "Error humano", impacto: "Pérdida económica", prob: "Media", sev: "Alta", control: "Validación previa + controles de pago", tipo: "Detectivo", etapa: "Pago", resp: "Tesorería" },
-            { riesgo: "Compras fuera del proceso", causa: "Falta de control", impacto: "Riesgo de fraude", prob: "Media", sev: "Alta", control: "KPI + auditoría de compras", tipo: "Detectivo", etapa: "Control", resp: "Auditoría" },
-            { riesgo: "Exceso de compras urgentes", causa: "Mala planeación", impacto: "Costos elevados", prob: "Alta", sev: "Alta", control: "Alertas de compras urgentes", tipo: "Detectivo", etapa: "SC", resp: "Sistema" },
-            { riesgo: "Falta de trazabilidad", causa: "Procesos manuales", impacto: "Problemas de auditoría", prob: "Baja", sev: "Alta", control: "Bitácora completa del proceso", tipo: "Preventivo", etapa: "General", resp: "Sistema" },
-            { riesgo: "Incidencias no gestionadas", causa: "Falta de seguimiento", impacto: "Impacto operativo", prob: "Media", sev: "Alta", control: "Bitácora de incidencias + seguimiento", tipo: "Detectivo", etapa: "Incidencias", resp: "Compras" }
-        ],
-        diagrama: {
-            url: "https://www.figma.com/board/LcHyLrp5TAAwHA8NlENxst/Procesos-Bloque-1--Compras--Almacen--Mantenimiento-?node-id=431-2488",
-            img: "img/image2.png",
-            text: "Ver diagrama completo de Compras"
-        }
-    },
-    almacen: {
-        contexto: {
-            icon: "📦",
-            title: "Gestión de Almacén",
-            objetivo: "Establecer un modelo estandarizado, digital y basado en datos para la gestión del almacén que garantice:<br>• Disponibilidad de materiales<br>• Trazabilidad del inventario (objetivo: 100%)<br>• Control operativo en tiempo real<br>• Alineación entre inventario físico y sistema",
-            alcance: "El proceso de gestión de almacén abarca desde la planeación de inventarios hasta la mejora continua, incluyendo la organización del almacén, recepción de materiales, control de inventario, gestión de salidas y control operativo. Asimismo, contempla la detección de necesidades de abastecimiento, las cuales se formalizan mediante requisiciones que conectan con el proceso de Compras, garantizando trazabilidad, control en tiempo real y alineación entre el inventario físico y el sistema."
-        },
-        proceso: [
-            { step: "1", title: "Planeación de Inventarios", actor: "Planeación / Operaciones", desc: "Se realiza una planeación mensual integrada con operaciones, utilizando datos históricos y variables del negocio.<br>• Áreas operativas definen necesidades mensuales<br>• Se realiza el análisis de consumo histórico por producto<br>• Clasificación de productos:<br>&emsp;  o Críticos: deben mantenerse siempre en stock<br>&emsp;  o Bajo demanda: se compran contra necesidad<br>• Se realiza evaluación de variables:<br>&emsp;  o Precio<br>&emsp;  o Rotación<br>&emsp;  o Disponibilidad<br>&emsp;  o Espacio en almacén<br>• Se establecen niveles de inventario:<br>&emsp;  o Stock mínimo<br>&emsp;  o Stock máximo<br>&emsp;  o Punto de reorden", consid: "", res: "• Plan de abastecimiento<br>• Niveles de inventario" },
-            { step: "2", title: "Organización del Almacén", actor: "Almacén", desc: "Se estructura el almacén de forma estandarizada para asegurar trazabilidad y control.<br>• Definir estructura de almacenes (tipos y jerarquía)<br>• Estandarizar ubicaciones:<br>&emsp;  o Zona<br>&emsp;  o Rack<br>&emsp;  o Nivel<br>&emsp;  o Posición<br>• Normalizar catálogo y SKU<br>• Asignar ubicación a cada producto<br>• Implementar identificación visual:<br>&emsp;  o Etiquetas<br>&emsp;  o Códigos<br>&emsp;  o Fotografías", consid: "", res: "• Almacen estructurado y actualizado<br>• Catálogo estandarizado" },
-            { step: "3", title: "Recepción de Materiales", actor: "Almacén", desc: "Proceso estructurado de ingreso de materiales con validación total.<br>• Recibir material contra Orden de Compra<br>• Valida:<br>&emsp;  ▪ Cantidad<br>&emsp;  ▪ Calidad<br>• Evaluar condición del material<br>&emsp;  o Decisión:<br>&emsp;&emsp;    ▪ No cumple → rechazo / devolución<br>&emsp;&emsp;    ▪ Cumple → continuar<br>• Registrar entrada en sistema en tiempo real<br>• Generar evidencia (opcional)<br>• Asignar ubicación", consid: "", res: "• Inventario actualizado<br>• Registro de entrada" },
-            { step: "4", title: "Control de Inventario", actor: "Almacén, Auditoría / Supervisión, Dirección / Sistema", desc: "Se mantiene control continuo del inventario asegurando su exactitud<br>• Monitoreo continuo<br>&emsp;  o Consultar inventario en sistema<br>&emsp;  o Validar niveles por producto<br>• Validación contra niveles definidos<br>&emsp;  o Comparar contra:<br>&emsp;&emsp;    ▪ Stock mínimo<br>&emsp;&emsp;    ▪ Punto de reorden<br>&emsp;  o Decisión: ¿Se requiere reabastecimiento?<br>&emsp;&emsp;    ▪ Condiciones:<br>      • Inventario < stock mínimo<br>      • Producto crítico sin disponibilidad<br>      • Proyección de consumo supera inventario<br>• Generación de requisición de compra (conexión con proceso de compras)<br>&emsp;  o Actividades:<br>&emsp;&emsp;    ▪ Identificación producto(s) a reabastecer<br>&emsp;&emsp;    ▪ Definir cantidad sugerida<br>&emsp;&emsp;    ▪ Genera requisición en sistema<br>• Registrar:<br>&emsp;  o Producto<br>&emsp;  o Cantidad<br>&emsp;  o Justificación<br>&emsp;  o Fecha<br>&emsp;  o Enviar requisición al área de Compras<br>• Integración con proceso de Compras<br>&emsp;  o La requisición se convierte en entrada formal del proceso de Compras<br>• Control de inventario interno<br>&emsp;  o Realizar conteos cíclicos<br>&emsp;  o Identificar diferencias<br>&emsp;  o Registrar ajustes con causa raíz<br>&emsp;  o Actualizar sistema", consid: "", res: "o Requisiciones de compra<br>o Inventario actualizado<br>o Registro de ajustes" },
-            { step: "5", title: "Control de Salidas", actor: "Almacén, Operaciones, Supervisión/Dirección", desc: "Gestión controlada de salidas de materiales con clasificación y trazabilidad.<br>• Se recibe solicitud de salida<br>• Se clasifica el tipo de salida:<br>  • Con autorización<br>  • Sin autorización<br>  • Contra cambio<br>• Se valida disponibilidad<br>• Autorizar salida (si aplica – Supervisión/Dirección)<br>• Preparación de pedido (picking estructurado)<br>• Registro en sistema antes de entrega<br>• Entrega del material", consid: "", res: "• Inventario actualizado<br>• Salida registrada" },
-            { step: "6", title: "Control y Orden del Almacén", actor: "Almacén, Auditoría y Supervisión", desc: "Garantizar que el almacén físico y el sistema estén completamente alineados.<br>• Validación sistema vs inventario físico<br>• Implementación de orden y limpieza<br>• Identificación visual de productos y ubicaciones<br>• Supervisar cumplimiento (Supervisión)<br>• definir periodos de auditorías programadas (1 por mes)", consid: "", res: "• Almacén organizado<br>• Inventario alineado" },
-            { step: "7", title: "Evaluación y Auditoría", actor: "Auditoría / Supervisión, Sistemas y Dirección", desc: "Se mide el desempeño del proceso mediante indicadores y auditorías.<br>• Se realizan auditorías periódicas programadas<br>• Medir indicadores (Sistemas)<br>• Analizar desviaciones (Dirección)<br>• Generación de reportes", consid: "", res: "• Reportes de auditoría<br>• Indicadores de desempeño (KPIs)" },
-            { step: "8", title: "Retroalimentación y Mejora Continua", actor: "Dirección / Administración, Supervisión y Operaciones", desc: "Gestión formal de mejora del proceso basada en resultados.<br>• Revisión periódica de KPIs<br>• Realizar sesiones formales de retroalimentación<br>• Definición de acciones correctivas (Operaciones)<br>• Seguimiento y cierre (Supervisión)", consid: "", res: "• Plan de mejora<br>• Acciones implementadas" }
-        ],
-        subprocesos: [],
-        reglas: [
-            "• Todo producto debe estar registrado en el sistema antes de ser gestionado en el almacén.",
-            "• Todo producto debe contar con un SKU único, estandarizado y no duplicado.",
-            "• Todo producto debe tener una ubicación asignada dentro del almacén.",
-            "• Todos los movimientos de inventario (entradas, salidas, ajustes) deben registrarse en tiempo real.",
-            "• Reglas de recepción:<ul style='margin:4px 0 4px 20px;'><li> o No se permite la recepción sin una Orden de Compra válida.</li><li> o Toda recepción debe validarse contra la OC en cantidad y especificación.</li><li> o Todo material debe pasar validación de calidad. Los que no cumplan se rechazan.</li><li> o Debe ubicarse inmediatamente.</li></ul>",
-            "• Reglas de inventario:<ul style='margin:4px 0 4px 20px;'><li>o Monitoreo continuo mediante el sistema.</li><li>o Conteos cíclicos periódicos conforme a programación.</li><li>o Toda diferencia físico vs sistema se registra con causa raíz.</li><li>o No se permiten ajustes sin justificación.</li></ul>"
-        ],
-        kpis: [
-            { cat: "Inventario", nombre: "Exactitud de inventario (%)", formula: "(Inventario correcto / Inventario total) × 100", interpretacion: "Mide la confiabilidad del inventario. Un valor cercano a 100% indica control total." },
-            { cat: "Inventario", nombre: "Nivel de trazabilidad (%)", formula: "(Movimientos registrados / Movimientos totales) × 100", interpretacion: "100% = trazabilidad total." },
-            { cat: "Inventario", nombre: "Diferencias inventario físico vs sistema", formula: "Inventario físico – Inventario sistema", interpretacion: "Debe tender a 0." },
-            { cat: "Recepción", nombre: "Tiempo de recepción", formula: "Hora registro – Hora recepción", interpretacion: "Evalúa eficiencia. Ideal: en tiempo real." },
-            { cat: "Servicio", nombre: "Tiempo de atención", formula: "Hora inicio atención – Hora solicitud", interpretacion: "Menor tiempo = mayor eficiencia." },
-            { cat: "Servicio", nombre: "Número de salidas por día", formula: "Total de salidas en el día", interpretacion: "Mide la carga operativa." },
-            { cat: "Servicio", nombre: "Nivel de cumplimiento de pedidos (%)", formula: "(Pedidos cumplidos / Pedidos totales) × 100", interpretacion: "Mide el nivel de servicio." },
-            { cat: "Control", nombre: "% de movimientos registrados en tiempo real", formula: "(Movimientos en tiempo real / Movimientos totales) × 100", interpretacion: "Objetivo: 100%." },
-            { cat: "Calidad", nombre: "% de incidencias general", formula: "(Incidencias totales / Movimientos totales) × 100", interpretacion: "Fallas operativas. Debe ser bajo." },
-            { cat: "Calidad", nombre: "% de recepciones con incidencias", formula: "(Recepciones con error / Recepciones totales) × 100", interpretacion: "Evalúa calidad del proveedor." },
-            { cat: "Calidad", nombre: "Tiempo de validación en recepción", formula: "Hora validación – Hora recepción", interpretacion: "Eficiencia del control de calidad." },
-            { cat: "5S", nombre: "Nivel de cumplimiento (%) (Orden y control)", formula: "(Puntos cumplidos / Puntos evaluados) × 100", interpretacion: "Evalúa disciplina operativa." },
-            { cat: "Sistema", nombre: "Alineación sistema vs inventario físico (%)", formula: "(Productos correctos / Productos revisados) × 100", interpretacion: "Mide control general. Ideal: ≥ 98%." }
-        ],
-        roles: [
-            { rol: "Planeación / Operaciones", resp: "Definir la demanda y necesidades de inventario alineadas a la operación", act: "- Proyectar demanda mensual\n- Analizar consumo histórico\n- Clasificar productos (críticos / bajo demanda)\n- Definir niveles de inventario", etapa: "Planeación de inventarios" },
-            { rol: "Compras", resp: "Abastecer materiales conforme a la planeación", act: "- Generar órdenes de compra\n- Coordinar entregas con proveedores\n- Asegurar disponibilidad de materiales", etapa: "Planeación / Recepción" },
-            { rol: "Almacén", resp: "Gestionar el control operativo del inventario físico y digital", act: "- Recepción de materiales\n- Registro de entradas y salidas en sistema\n- Asignación de ubicaciones\n- Preparación de pedidos (picking)\n- Control de inventario\n- Ejecución de conteos cíclicos", etapa: "Organización / Recepción / Inventario / Salidas / Control" },
-            { rol: "Calidad", resp: "Validar que los materiales cumplan con los estándares requeridos", act: "- Inspección de calidad en recepción\n- Validación de condiciones del producto\n- Aprobación o rechazo de materiales", etapa: "Recepción" },
-            { rol: "Auditoría / Supervisión", resp: "Asegurar cumplimiento del proceso y exactitud del inventario", act: "- Auditorías periódicas\n- Validación físico vs sistema\n- Identificación de desviaciones\n- Seguimiento a diferencias", etapa: "Evaluación / Control" },
-            { rol: "Dirección / Administración", resp: "Dar seguimiento estratégico al desempeño del almacén", act: "- Revisión de KPIs\n- Toma de decisiones estratégicas\n- Priorización de acciones de mejora", etapa: "Evaluación / Retroalimentación" }
-        ],
-        riesgos: [
-            { riesgo: "Planeación incorrecta de inventarios", causa: "Falta o exceso de stock", impacto: "Alto", prob: "Media", sev: "Alta", control: "Planeación basada en históricos + validación con operaciones", tipo: "Preventivo", etapa: "Planeación", resp: "Planeación" },
-            { riesgo: "No clasificación de productos", causa: "Desabasto de productos críticos", impacto: "Alto", prob: "Media", sev: "Alta", control: "Clasificación obligatoria de productos", tipo: "Preventivo", etapa: "Planeación", resp: "Planeación" },
-            { riesgo: "Ubicaciones no estandarizadas", causa: "Pérdida de trazabilidad", impacto: "Alto", prob: "Alta", sev: "Alta", control: "Estructura definida de ubicaciones (zona, rack, nivel)", tipo: "Preventivo", etapa: "Organización", resp: "Almacén" },
-            { riesgo: "SKU duplicados o mal definidos", causa: "Errores en inventario", impacto: "Alto", prob: "Media", sev: "Alta", control: "Catálogo centralizado y validado", tipo: "Preventivo", etapa: "Organización", resp: "Sistemas / Almacén" },
-            { riesgo: "Recepción sin orden de compra", causa: "Ingreso no controlado de material", impacto: "Alto", prob: "Baja", sev: "Alta", control: "Bloqueo de recepción sin OC", tipo: "Preventivo", etapa: "Recepción", resp: "Almacén" },
-            { riesgo: "Error en validación de cantidad o calidad", causa: "Inventario incorrecto", impacto: "Alto", prob: "Media", sev: "Alta", control: "Validación obligatoria + control de calidad", tipo: "Preventivo", etapa: "Recepción", resp: "Almacén / Calidad" },
-            { riesgo: "Registro tardío de entradas", causa: "Desfase sistema vs físico", impacto: "Alto", prob: "Alta", sev: "Alta", control: "Registro en tiempo real obligatorio", tipo: "Preventivo", etapa: "Recepción", resp: "Almacén" },
-            { riesgo: "Diferencias físico vs sistema", causa: "Pérdidas y descontrol", impacto: "Alto", prob: "Alta", sev: "Alta", control: "Conteos cíclicos periódicos", tipo: "Detectivo", etapa: "Inventario", resp: "Almacén" },
-            { riesgo: "Ajustes sin justificación", causa: "Riesgo de fraude o error", impacto: "Alto", prob: "Media", sev: "Alta", control: "Registro obligatorio de causa raíz", tipo: "Detectivo", etapa: "Inventario", resp: "Almacén / Auditoría" },
-            { riesgo: "No generación de requisiciones", causa: "Falta de abastecimiento", impacto: "Alto", prob: "Media", sev: "Alta", control: "Requisición obligatoria al detectar necesidad", tipo: "Preventivo", etapa: "Inventario", resp: "Almacén" },
-            { riesgo: "Entrega sin registro", causa: "Pérdida de control", impacto: "Alto", prob: "Alta", sev: "Alta", control: "Bloqueo de salida sin registro previo", tipo: "Preventivo", etapa: "Salidas", resp: "Almacén" }
-        ],
-        diagrama: {
-            url: "https://www.figma.com/board/LcHyLrp5TAAwHA8NlENxst/Procesos-Bloque-1--Compras--Almacen--Mantenimiento-?node-id=431-2776",
-            img: "img/image3.png",
-            text: "Ver diagrama completo de Almacén"
-        }
-    },
-    mantenimiento: {
-        contexto: {
-            icon: "🔧",
-            title: "Gestión de Mantenimiento",
-            objetivo: "Asegurar la disponibilidad, confiabilidad y seguridad de los activos (unidades, planta e instalaciones) mediante un sistema estructurado de mantenimiento preventivo y correctivo, basado en criterios técnicos, trazabilidad completa y control operativo en tiempo real.",
-            alcance: "El proceso de gestión de mantenimiento abarca la planeación, ejecución, control y seguimiento de los mantenimientos preventivos y correctivos de las unidades de recolección, desde la detección de eventos hasta su cierre y análisis. Incluye la inspección pre-operativa, el registro y clasificación de fallas bajo criterios técnicos, la programación con base en ventanas de mantenimiento, la ejecución de trabajos, su validación y la generación de indicadores para mejora continua, asegurando la disponibilidad, seguridad y confiabilidad de las unidades."
-        },
-        proceso: [
-            { step: "1", title: "Detección del evento", actor: "Operador, Sistema, Técnico, Encargado de mantenimiento", desc: "• El operador ejecuta checklist pre-operativo\n  1.2 Verifica condiciones:\n  • Fugas\n  • Presión\n  • Estado de mangueras\n  • Sistema de bombeo\n  • Frenos / llantas\n• El sistema evalúa:\n  • Km vs límite preventivo\n  • Horas vs límite preventivo\n• El operador detecta anomalías durante operación (si aplica)\n• Se identifica:\n  • Falla\n  • Condición de riesgo\n  • Necesidad de mantenimiento preventivo\n\nDecisión:\n¿Existe anomalía o mantenimiento requerido?\n• NO → Continúa operación\n• SÍ → pasa a registro", consid: "", res: "• Evento identificado" },
-            { step: "2", title: "Registro del evento", actor: "Operador / Técnico, Auxiliar administrativo, Sistema", desc: "• Se captura el evento en sistema (Herramienta digital)\n• Se registra:\n  • ID de unidad\n  • Tipo de evento (preventivo / correctivo)\n  • Sistema afectado\n  • Descripción detallada\n  • Fecha y hora\n  • Usuario\n• Se capturan evidencias:\n  • Fotografías\n  • Videos\n  • Resultado de checklist\n• Se registran medidores:\n  • Km (odómetro)\n  • Horas (horómetro)\n• El sistema valida:\n  • Campos obligatorios\n  • Evidencia\n• Se genera folio automático", consid: "Reglas que se deben de respetar:\n• Evento sin registro → no existe\n• Evento sin evidencia → no avanza\n• Uso de formatos homologados obligatorio", res: "• Evento registrado y trazable" },
-            { step: "3", title: "Clasificación de la falla", actor: "Encargado de mantenimiento, Técnico", desc: "• Evaluar condición de seguridad:\n  • ¿Existe riesgo inmediato?\n• Evaluar cumplimiento legal:\n  • ¿Incumple norma?\n• Evaluar capacidad técnica:\n  • ¿Se puede diagnosticar?\n• Clasificar urgencia:\n  • Crítico → detiene operación\n  • Alto → atención prioritaria\n  • Bajo → programable\n• Estimar rango de costo:\n  • A / B / C / D\n\nResultado (Asignación de estado):\n• Disponible\n• Disponible con restricción\n• En mantenimiento\n• Fuera de servicio", consid: "Reglas que se deben de respetar:\n• Seguridad → detención inmediata\n• Legal → no operar\n• Sin certeza técnica → escalar", res: "• Evento clasificado + estatus" },
-            { step: "4", title: "Toma de decisión", actor: "Encargado de mantenimiento, Dirección, Finanzas", desc: "• Evaluar criterios de decisión\n  4.2 Definir acción:\n  • Ejecutar inmediato\n  • Programar mantenimiento\n  • Escalar\n  • Permitir operación restringida", consid: "Reglas que se deben de respetar:\n• Preventivo → obligatorio\n• Riesgo → no operar\n• Costos altos → aprobación", res: "• Acción definida" },
-            { step: "5", title: "Programación", actor: "Encargado de mantenimiento, Coordinador de operaciones", desc: "• 5.1 Definir fecha de mantenimiento\n• 5.2 Validar disponibilidad de unidad\n• 5.3 Coordinar salida de operación\n• 5.4 Asignar técnico o proveedor\n• 5.5 Generar orden de mantenimiento\n\nGestión de ventanas de mantenimiento:\nSupuesto:\n * Mantenimiento preventivo cada 10,000 km", consid: "Regla crítica:\n• Fuera de tolerancia → detención automática", res: "• Orden programada" },
-            { step: "6", title: "Ejecución del mantenimiento", actor: "Técnico, Proveedor, Encargado", desc: "• 6.1 Recepción de orden\n• 6.2 Diagnóstico técnico\n• 6.3 Ejecución de mantenimiento:\n  • Reparación\n  • Ajuste\n  • Reemplazo\n• Registro en sistema:\n  • Actividades\n  • Refacciones\n  • Tiempo\n• 6.5 Captura de evidencia", consid: "Reglas que se deben de respetar:\n• Todo se registra\n• Evidencia obligatoria", res: "• Mantenimiento ejecutado" },
-            { step: "7", title: "Validación", actor: "Encargado de mantenimiento", desc: "• Verificar ejecución\n• Validar seguridad\n• Validar operatividad\n• Revisar evidencia\n• Pruebas funcionales", consid: "Regla que se debe de considerar:\n• No se puede cerrar sin validación", res: "• Evento validado" },
-            { step: "8", title: "Cierre", actor: "Auxiliar, Encargado", desc: "• Registrar:\n  • Acción realizada\n  • Costo real\n  • Observaciones\n• Actualizar estatus:\n  • Disponible / restricción\n• Cerrar evento en sistema", consid: "", res: "• Evento cerrado" },
-            { step: "9", title: "Reporte de mejora continua", actor: "Encargado, Dirección", desc: "• Generar KPIs\n• Analizar fallas recurrentes\n• Realizar análisis causa raíz\n• Ajustar rutinas preventivas", consid: "", res: "• Mejora del sistema" }
-        ],
-        subprocesos: [],
-        reglas: [
-            "Generales<br>• Todo evento de mantenimiento debe ser registrado en el sistema con información mínima obligatoria.<br>&emsp;  - Evento no registrado se considera inexistente.<br>• Todo evento debe contar con evidencia (fotográfica, checklist o documental) para poder avanzar en el flujo.<br>• Las decisiones del proceso deben basarse en criterios definidos (seguridad, legal, técnico, urgencia, costo), no en juicio personal.<br>• El sistema debe garantizar trazabilidad completa de cada evento desde su detección hasta su cierre.<br>• No se permite la ejecución de mantenimiento sin una orden de mantenimiento previamente generada.",
-            "Seguridad y cumplimmiento<br>• Ninguna unidad puede operar si representa riesgo para la seguridad de personas o activos.<br>• Ninguna unidad puede operar si incumple requisitos legales o normativos aplicables.<br>• Si una falla compromete seguridad o cumplimiento legal, la unidad debe cambiar automáticamente a estatus:<br>&emsp;  - Fuera de servicio<br>• Los criterios de seguridad y cumplimiento legal prevalecen sobre cualquier consideración operativa o económica."
-        ],
-        kpis: [
-            { cat: "Disponibilidad", nombre: "Disponibilidad de unidades (%)", formula: "(Unidades disponibles / Total) × 100", interpretacion: "Qué porcentaje de unidades está listo para operar" },
-            { cat: "Disponibilidad", nombre: "% unidades fuera de servicio", formula: "(Fuera de servicio / Total) × 100", interpretacion: "Cuántas unidades están detenidas" },
-            { cat: "Eficiencia", nombre: "Tiempo de respuesta", formula: "Hora atención - hora registro", interpretacion: "Qué tan rápido reaccionas ante fallas" },
-            { cat: "Eficiencia", nombre: "Tiempo de ejecución", formula: "Hora fin - hora inicio", interpretacion: "Qué tan rápido se resuelve el mantenimiento" },
-            { cat: "Eficiencia", nombre: "Órdenes atendidas vs generadas (%)", formula: "(Atendidas / Generadas) × 100", interpretacion: "Nivel de cumplimiento operativo" },
-            { cat: "Preventivo", nombre: "% cumplimiento de preventivos", formula: "(Preventivos realizados / programados) × 100", interpretacion: "Disciplina en mantenimiento preventivo" },
-            { cat: "Preventivo", nombre: "% cumplimiento de ventanas", formula: "(Preventivos en ventana / total) × 100", interpretacion: "Si el mantenimiento se hace a tiempo" },
-            { cat: "Preventivo", nombre: "% preventivo vs correctivo", formula: "(Preventivos / total eventos) × 100", interpretacion: "Nivel de madurez del sistema (ideal 80/20)" },
-            { cat: "Fallas", nombre: "Fallas en ruta", formula: "Conteo mensual", interpretacion: "Nivel de confiabilidad en operación" },
-            { cat: "Fallas", nombre: "Fallas recurrentes", formula: "Conteo de repetición", interpretacion: "Problemas no resueltos de raíz" },
-            { cat: "Costos", nombre: "Costo total de mantenimiento", formula: "Suma de costos", interpretacion: "Gasto total en mantenimiento" },
-            { cat: "Costos", nombre: "Costo por unidad", formula: "Costo total / unidades", interpretacion: "Eficiencia por unidad" },
-            { cat: "Costos", nombre: "Costo preventivo vs correctivo", formula: "Comparativo", interpretacion: "Si el sistema es reactivo o preventivo" },
-            { cat: "Control", nombre: "% eventos registrados", formula: "(Registrados / detectados) × 100", interpretacion: "Nivel de control del proceso" }
-        ],
-        roles: [
-            { rol: "Operador / Chofer", resp: "Ejecutor en campo y primer punto de detección", act: "- Ejecutar checklist pre-operativo\n- Identificar fugas o anomalías\n- Reportar eventos y evidencias\n- Detener operación si aplica", etapa: "1. Detección\n2. Registro" },
-            { rol: "Técnico de mantenimiento", resp: "Ejecutor técnico de mantenimiento", act: "- Ejecutar preventivos y correctivos\n- Diagnosticar fallas\n- Registrar refacciones y tiempos\n- Capturar evidencia técnica", etapa: "6. Ejecución\n3 y 7 como soporte" },
-            { rol: "Encargado de mantenimiento", resp: "Responsable del control operativo y toma de decisiones", act: "- Clasificar eventos (RCM)\n- Definir estatus y acciones\n- Programar y supervisar\n- Validar operatividad y seguridad\n- Autorizar cierre y analizar KPIs", etapa: "3, 4, 5, 6, 7, 8, 9" },
-            { rol: "Auxiliar administrativo", resp: "Soporte administrativo y control documental", act: "- Registrar eventos\n- Validar información y evidencias\n- Dar seguimiento a órdenes\n- Registrar costos y cierres", etapa: "2. Registro\n8. Cierre" },
-            { rol: "Coordinador de operaciones", resp: "Gestión de disponibilidad operativa", act: "- Coordinar operación vs mantenimiento\n- Coordinar salida de unidades a taller\n- Reprogramar rutas y priorizar críticas", etapa: "5. Programación" },
-            { rol: "Finanzas / Tesorería", resp: "Control y autorización financiera", act: "- Validar costos\n- Autorizar gastos fuera de rango\n- Registrar impacto financiero", etapa: "4. Decisión" },
-            { rol: "Dirección / Gerencia", resp: "Supervisión estratégica", act: "- Tomar decisiones estratégicas y críticas\n- Supervisar desempeño y KPIs\n- Definir mejoras", etapa: "4. Decisión\n9. Reporte" },
-            { rol: "Sistema (Soft Flot)", resp: "Soporte tecnológico y automatización", act: "- Generar alertas automáticas y folios\n- Validar reglas y campos\n- Bloquear unidades automáticamente\n- Generar reportes", etapa: "1, 2, 5, 6, 8, 9" }
-        ],
-        riesgos: [
-            { riesgo: "Operación de unidad en condiciones inseguras", causa: "No se realiza inspección", impacto: "Accidentes, daño a activos", prob: "Alta", sev: "Crítica", control: "Inspección obligatoria + bloqueo", tipo: "Preventivo", etapa: "Detección", resp: "Operador / Sistema" },
-            { riesgo: "Falta de registro de eventos", causa: "Omisión del usuario", impacto: "Pérdida de trazabilidad", prob: "Media", sev: "Alta", control: "Registro obligatorio + validación", tipo: "Preventivo / Detectivo", etapa: "Registro", resp: "Sistema / Auxiliar" },
-            { riesgo: "Eventos sin evidencia", causa: "Falta de disciplina", impacto: "Decisiones incorrectas", prob: "Media", sev: "Alta", control: "Evidencia obligatoria para avanzar", tipo: "Preventivo", etapa: "Registro", resp: "Sistema / Técnico" },
-            { riesgo: "Clasificación incorrecta de fallas", causa: "Falta de criterio técnico", impacto: "Riesgo operativo", prob: "Media", sev: "Alta", control: "Uso de criterios RCM", tipo: "Preventivo", etapa: "Clasificación", resp: "Encargado" },
-            { riesgo: "No ejecución de mantenimiento preventivo", causa: "Mala planificación", impacto: "Costos y fallas", prob: "Alta", sev: "Crítica", control: "Control por ventanas + bloqueo automático", tipo: "Preventivo", etapa: "Programación", resp: "Sistema / Encargado" },
-            { riesgo: "Fallas recurrentes no atendidas", causa: "No se analiza causa raíz", impacto: "Aumento de costos", prob: "Media", sev: "Alta", control: "Análisis de causa raíz + ajuste preventivo", tipo: "Correctivo", etapa: "Reporte", resp: "Encargado" },
-            { riesgo: "Baja disponibilidad de unidades", causa: "Mala gestión de mantenimiento", impacto: "Incumplimiento operativo", prob: "Alta", sev: "Crítica", control: "KPI de disponibilidad + programación", tipo: "Preventivo", etapa: "Programación", resp: "Operaciones" },
-            { riesgo: "Cierre de eventos sin validación", causa: "Omisión del proceso", impacto: "Pérdida de calidad", prob: "Media", sev: "Alta", control: "Regla de no cierre sin validación en sistema", tipo: "Preventivo", etapa: "Cierre", resp: "Sistema" }
-        ],
-        diagrama: {
-            url: "https://www.figma.com/board/LcHyLrp5TAAwHA8NlENxst/Procesos-Bloque-1--Compras--Almacen--Mantenimiento-?node-id=431-3064",
-            img: "img/image5.png",
-            text: "Ver diagrama completo de Mantenimiento"
-        }
+    proceso: [
+        { step: `Flujo A - 0`, title: `Validación Operativa (Antes de extracción)`, actor: `Logística y Recolección`, desc: `Validar en campo:
+- Registro de recolección
+- Kilos capturados (Netos)
+- Evidencias (foto, firma, nombre)
+- Dirección correcta`, consid: `• Evidencias obligatorias en MUTA. <br>• Base para confiabilidad del proceso.`, res: `Información operativa validada` },
+        { step: `Flujo A - 1`, title: `Extracción de datos desde MUTA`, actor: `Administración`, desc: `Descarga de reporte de recolecciones desde MUTA (Código interno generador, fecha de recolección, estado, dirección, método, tags generador, RFC, kilos(netos/brutos), precio).`, consid: `La extracción debe considerar todos los clientes, agrupados luego por RFC.`, res: `Dataset base de recolecciones` },
+        { step: `Flujo A - 2`, title: `Validación operativa (Filtro de registros)`, actor: `Administración`, desc: `• Filtrar registros con estado válido (Completado/Verificado). <br>• Validar integridad de datos (RFC, kilos, precio), no duplicidad, estructura de agrupamiento, RFC en CRM y precio vigente.`, consid: `Inconsistencias no bloquean el pago, se registran como incidencias. Solo las que afectan el monto se resuelven antes del cálculo.`, res: `Registros válidos para procesamiento` },
+        { step: `Flujo A - 3`, title: `Consolidación de información`, actor: `Administración`, desc: `• Agrupar información por: Grupo, Cliente, RFC/Agrupamiento, Periodo. <br>Aplicar reglas: <br>•Monto mínimo ($500), <br>•Exclusión de registros inválidos.`, consid: `<br>•Generar 1 orden de pago por RFC. <br>•Considerar tipos de agrupamiento.`, res: `Base consolidada por cliente y periodo` },
+        { step: `Flujo A - 4`, title: `Cálculo de pagos`, actor: `Administración`, desc: `<br>•Calcular monto por cliente: Monto = (Kilos MUTA − Kilos donados) × Precio ± Penalizaciones. <br>•Validar consistencia de kilos y precio. Usar OCR / IA.`, consid: `Kilos donados (programa árboles) y penalizaciones calculadas separadamente.`, res: `Monto total a pagar por cliente` },
+        { step: `Flujo A - 5`, title: `Generación de Orden de Pago`, actor: `Administración`, desc: `Generar documento estándar que incluye: RFC, desglose por sucursal, periodo, kilos, monto total, referencias. Enviar orden y solicitar factura.`, consid: `-`, res: `Orden de pago enviada` },
+        { step: `Flujo A - 6`, title: `Facturación (Cliente)`, actor: `Cliente`, desc: `Recibir orden de pago, emitir factura y enviar a Sonne.`, consid: `•Ciclo de cortes: 1er corte (día 15), 2do corte (fin de mes). <br>•Facturas no enviadas se acumulan.`, res: `Factura emitida y enviada` },
+        { step: `Flujo A - 7`, title: `Recepción y validación de factura`, actor: `Administración`, desc: `Recepción de factura. Validación de: RFC correcto, monto coincidente, datos fiscales completos.`, consid: `Regla crítica: <br>•Sin factura NO se procesa el pago. <br>•Factura incorrecta = rechazo.`, res: `Factura validada y autorizada` },
+        { step: `Flujo A - 8`, title: `Aprobación financiera`, actor: `Administración / Tesorería / GG`, desc: `•Nivel 1: Administración (Cálculo, orden, factura). <br>•Nivel 2: Tesorería (Disponibilidad de fondos). <br>•Nivel 3: GG (Excepciones).`, consid: `•Rechazado -> Corrección / Aplazamiento. <br>•Aprobado -> ejecución.`, res: `Pago autorizado` },
+        { step: `Flujo A - 9`, title: `Ejecución del pago`, actor: `Tesorería`, desc: `•Realizar transferencia (SPEI/bancaria). <br>•Registrar: referencia, fecha, monto.`, consid: `Pagos por corte y pagos especiales.`, res: `Pago ejecutado` },
+        { step: `Flujo A - 10`, title: `Notificación al cliente`, actor: `Administración`, desc: `Enviar confirmación de pago: Comprobante y detalle.`, consid: `-`, res: `Cliente notificado` },
+        { step: `Flujo A - 11`, title: `Registro y conciliación`, actor: `Administración / Finanzas`, desc: `•Registro contable. <br>• Conciliación bancaria. <br>•Cierre del periodo. <br>•Pagos acumulados. <br>•Pagos por corte. <br>•Pagos especiales`, consid: `-`, res: `Proceso cerrado y conciliado` },
+        
+        { step: `Flujo B - 1`, title: `Identificación de la necesidad`, actor: `Gerencia Comercial`, desc: `•Analizar volumen comprometido vs inventario. <br>•Detectar déficit. <br>•Revisar precio mercado y evaluar proveedor.`, consid: `-`, res: `Decisión de compra tomada` },
+        { step: `Flujo B - 2`, title: `Negociación y acuerdo`, actor: `Gerencia Comercial`, desc: `•Contactar proveedor. <br>•Negociar precio, volumen, tipo de material, y condición de pago (efectivo, SPEI, anticipo). <br>•Definir lugar/fecha. <br>•Registrar acuerdo.`, consid: `Alta variabilidad y posible falta de formalidad.`, res: `Acuerdo documentado` },
+        { step: `Flujo B - 3`, title: `Recepción y verificación`, actor: `Operaciones / Planta`, desc: `•Recibir unidad. <br>•Pesaje en báscula Sonne (dato oficial). <br>•Análisis de calidad (Acidez, Humedad, Impurezas). <br>•Comparar kilos acordados vs recibidos.`, consid: `•El dato de Sonne es oficial. <br>•Registrar cualquier desviación.`, res: `Kilos aceptados y validados` },
+        { step: `Flujo B - 4`, title: `Cálculo del monto`, actor: `Administración / Comercial`, desc: `•Kilos aceptados × Precio. <br>•Aplicar ajustes por calidad/volumen. <br>•Validar anticipos.`, consid: `Evitar cálculos manuales sin respaldo. Todo documentado.`, res: `Monto validado` },
+        { step: `Flujo B - 5`, title: `Facturación / documentación`, actor: `Proveedor / Administración`, desc: `Si hay factura: <br>•Validar RFC y monto. Si NO hay: <br>•Registrar flag 'sin factura', generar nota, foto báscula, comprobante y justificar excepción.`, consid: `Riesgo fiscal directo. Requiere trazabilidad total.`, res: `Factura o documentación válida` },
+        { step: `Flujo B - 6`, title: `Aprobación financiera`, actor: `Admin / Tesorería / GG`, desc: `•N1: Admin (monto, kilos, evidencias). <br>•N2: Tesorería (fondos). <br>•N3: GG (pago en efectivo, sin factura, excepciones).`, consid: `-`, res: `Pago autorizado` },
+        { step: `Flujo B - 7`, title: `Ejecución del pago`, actor: `Tesorería`, desc: `•Definir forma (SPEI / Efectivo como excepción). <br>•Ejecutar y registrar referencia.`, consid: `-`, res: `Pago ejecutado` },
+        { step: `Flujo B - 8`, title: `Registro y conciliación`, actor: `Finanzas / Contabilidad`, desc: `•Registrar costo materia prima. <br>•Clasificar deducible/no deducible. <br>•Marcar riesgo fiscal. <br>•Conciliar banco.`, consid: `-`, res: `Pago registrado y conciliado` },
+        
+        { step: `Flujo C - 1`, title: `Validación de condiciones de pago`, actor: `Administración`, desc: `•Revisar Orden de Compra y condiciones de pago. <br>•Validar que la recepción esté registrada en sistema.`, consid: `Sin recepción validada, no se continúa.`, res: `Condiciones de pago confirmadas` },
+        { step: `Flujo C - 2`, title: `Recepción y validación de factura (3-WAY MATCH)`, actor: `Administración / Sistema`, desc: `Validar factura contra OC y Recepción (proveedor, monto, concepto, datos fiscales).`, consid: `3-way match obligatorio. Si no coincide, rechazo.`, res: `Factura validada` },
+        { step: `Flujo C - 3`, title: `Programación del pago`, actor: `Administración / Tesorería`, desc: `Definir fecha de pago según vencimiento y flujo de caja.`, consid: `Si hay falta de liquidez, negociar extensión.`, res: `Pago programado` },
+        { step: `Flujo C - 4`, title: `Aprobación financiera`, actor: `Admin / Tesorería / GG`, desc: `•N1: Admin valida OC, factura, cálculo. <br>•N2: Tesorería valida fondos. <br>•N3: GG aprueba excepciones.`, consid: `Si error, regresa a validación. Si falta fondos, aplaza.`, res: `Pago autorizado` },
+        { step: `Flujo C - 5`, title: `Ejecución del pago`, actor: `Tesorería`, desc: `•Transferencia SPEI. <br>•Registrar referencia, fecha, monto. <br>•Notificar proveedor.`, consid: `-`, res: `Pago ejecutado` },
+        { step: `Flujo C - 6`, title: `Registro y conciliación`, actor: `Finanzas / Contabilidad`, desc: `•Registrar en centro de costo y partida contable. <br>•Conciliar banco. <br>•Cerrar OC.`, consid: `-`, res: `Pago registrado y conciliado` }
+    ],
+    subprocesos: [
+        { title: `Gestión de Penalizaciones`, desc: `Se gestiona fuera del flujo principal, no bloquea pagos. Penalizaciones a clientes (mezcla indebida, retrasos, visitas cero) generan reducción del monto. Penalizaciones a proveedores (errores, retrasos) generan ajustes internos o económicos.` },
+        { title: `Soporte TI`, desc: `Soporte a incidencias operativas en MUTA, calidad de datos (corrección de direcciones, ajusten en duplicados) y soporte evolutivo (mejoras al sistema).` },
+        { title: `Pago a ONG (Programa Arbolitos)`, desc: `Gestionar el pago correspondiente a los kilos donados a ONG. Separado del pago al generador. Cálculo sobre kilos donados. Registro como gasto separado.` }
+    ],
+    reglas: [
+        `<b>Flujo A</b> - Validación: Todo registro debe contener RFC, kilos, precio y estado válido. MUTA es la única fuente de datos operativos.`,
+        `<b>Flujo A</b> - Cálculo: Se calcula como Kilos Netos (ajustado para donaciones) × Precio.`,
+        `<b>Flujo A</b> - Financieras: Pagos < $500 se acumulan. Se ejecutan en periodos definidos (2 cortes al mes).`,
+        `<b>Flujo A</b> - Facturación: No se puede ejecutar un pago sin factura válida que coincida con la Orden de Pago.`,
+        `<b>Flujo B</b> - Recepción: Peso registrado en báscula Sonne es oficial. Sin validación de calidad, no se continúa. Material rechazado no genera pago.`,
+        `<b>Flujo B</b> - Facturación: Pagos sin factura son excepcionales y requieren flag 'sin factura', justificación, fotos y autorización de GG.`,
+        `<b>Flujo C</b> - Origen: Todo pago debe estar respaldado por una OC aprobada y una recepción validada.`,
+        `<b>Flujo C</b> - Validación: 3-WAY MATCH obligatorio (OC + Recepción + Factura coinciden).`,
+        `<b>Flujo C</b> - Ejecución: Pagos vía transferencia (SPEI) y aprobados según matriz (N1, N2, N3).`
+    ],
+    kpis: [
+        { cat: `Flujo A`, nombre: `Tiempo total de ciclo de pago`, formula: `Fecha pago – Fecha extracción`, interpretacion: `Menor tiempo = mayor eficiencia` },
+        { cat: `Flujo A`, nombre: `% de pagos con errores`, formula: `(Pagos con error / Total) × 100`, interpretacion: `Ideal <5%` },
+        { cat: `Flujo A`, nombre: `Costo por kilo`, formula: `Total pagado / Total kilos`, interpretacion: `Base para margen` },
+        { cat: `Flujo A`, nombre: `% pagos sin factura`, formula: `(Pagos sin factura / Total) × 100`, interpretacion: `Debe ser 0% esperado` },
+        { cat: `Flujo B`, nombre: `% compras con factura`, formula: `(Con factura / Total) × 100`, interpretacion: `Bajo = riesgo fiscal` },
+        { cat: `Flujo B`, nombre: `% rechazos de material`, formula: `(Rechazadas / Total) × 100`, interpretacion: `Alto = mala calidad proveedor (<10%)` },
+        { cat: `Flujo C`, nombre: `Tiempo factura → pago`, formula: `Fecha pago − fecha factura`, interpretacion: `Dentro del plazo acordado` },
+        { cat: `Flujo C`, nombre: `% pagos con 3-way match`, formula: `(Pagos validados / total) × 100`, interpretacion: `Control clave, debe ser 100%` }
+    ],
+    roles: [
+        { rol: `Logística y Recolección (A)`, resp: `Validar información en campo`, act: `Registrar en MUTA, capturar kilos, evidencias`, etapa: `Flujo A: 0` },
+        { rol: `Administración (A, B, C)`, resp: `Control y cálculo`, act: `Validar datos, calcular monto, generar OC/pagos, 3-way match`, etapa: `Todas las fases administrativas` },
+        { rol: `Cliente / Proveedor`, resp: `Facturación y entrega`, act: `Emitir factura, entregar material, proveer evidencia`, etapa: `Fases de facturación y entrega` },
+        { rol: `Gerencia Comercial (B)`, resp: `Negociar compras`, act: `Detectar necesidad, negociar precio, registrar acuerdo`, etapa: `Flujo B: 1, 2` },
+        { rol: `Operaciones / Planta (B)`, resp: `Recepción y calidad`, act: `Recibir material, pesar, analizar calidad`, etapa: `Flujo B: 3` },
+        { rol: `Tesorería (A, B, C)`, resp: `Ejecutar pago`, act: `Validar fondos, ejecutar transferencia`, etapa: `Fases de ejecución` },
+        { rol: `Finanzas (A, B, C)`, resp: `Registro y conciliación`, act: `Registrar contablemente, conciliar bancos`, etapa: `Fases finales` },
+        { rol: `Gerencia General`, resp: `Aprobar excepciones`, act: `Aprobar pagos sin factura, en efectivo o urgencias`, etapa: `Aprobación Nivel 3` }
+    ],
+    riesgos: [
+        { riesgo: `Pago incorrecto`, causa: `Error en cálculo`, impacto: `Alto`, prob: `Media`, sev: `Alta`, control: `Validación de cálculo / Aprobación N1`, tipo: `Preventivo`, etapa: `Cálculo`, resp: `Administración` },
+        { riesgo: `Pago sin factura`, causa: `Omisión validación`, impacto: `Alto`, prob: `Baja`, sev: `Alta`, control: `Bloqueo por sistema sin factura`, tipo: `Preventivo`, etapa: `Factura`, resp: `Administración` },
+        { riesgo: `Duplicidad de pago`, causa: `Falta control de duplicados`, impacto: `Alto`, prob: `Media`, sev: `Alta`, control: `Validación duplicidad (ID + fecha)`, tipo: `Preventivo`, etapa: `Validación`, resp: `Administración` },
+        { riesgo: `Error en kilos netos`, causa: `Uso incorrecto de kilos`, impacto: `Alto`, prob: `Media`, sev: `Alta`, control: `Validación cruzada MUTA vs interno`, tipo: `Detectivo`, etapa: `Cálculo`, resp: `Administración` },
+        { riesgo: `Transferencia errónea`, causa: `Datos bancarios incorrectos`, impacto: `Alto`, prob: `Baja`, sev: `Alta`, control: `Validación previa de cuenta`, tipo: `Detectivo`, etapa: `Ejecución`, resp: `Tesorería` }
+    ],
+    formatos: [
+        { title: `Formato de Orden de Pago`, objetivo: `Formalizar el monto a pagar al cliente y solicitar factura`, campos: `ID / Folio, Cliente (RFC), Periodo, Total de kilos netos, Precio por kilo, Monto total, Referencia, Fecha, Estatus`, uso: `Etapa 5 – Generación de orden de pago` },
+        { title: `Formato de Validación de Factura`, objetivo: `Asegurar que la factura sea correcta antes del pago`, campos: `Folio de orden, RFC cliente, Monto factura, Coincidencia (Sí/No), Validación fiscal, Observaciones, Estatus`, uso: `Etapa 7 – Validación de factura` },
+        { title: `Formato de Penalizaciones`, objetivo: `Gestionar ajustes fuera del flujo principal`, campos: `ID penalización, Tipo, Motivo, Cliente, Monto, Evidencia, Estatus, Aplicación`, uso: `Subproceso de penalizaciones` }
+    ],
+    diagrama: {
+        url: `https://www.figma.com/board/LcHyLrp5TAAwHA8NlENxst/Procesos-Bloque-1--Compras--Almacen--Mantenimiento-?node-id=409-124`,
+        img: `img/Proceso Pagos.jpg`, 
+        text: `Ver diagrama completo de Pagos`
     }
+},
+    compras: {
+    contexto: {
+        icon: `🛒`,
+        title: `Gestión de Compras`,
+        objetivo: `Garantizar la adquisición oportuna, eficiente y controlada de bienes y servicios, optimizando el uso del presupuesto, asegurando transparencia en la selección de proveedores y cumpliendo con las políticas internas mediante un esquema de control basado en niveles de compra, validaciones financieras y segregación de funciones. `,
+        alcance: `El proceso abarca todas las actividades desde la detección de la necesidad hasta el pago al proveedor y evaluación posterior, incluyendo: 
+
+<br>•Creación de Solicitud de Compra (SC)  
+
+<br>•Clasificación de compra por nivel (monto y urgencia)  
+
+<br>•Validación presupuestal (Finanzas)  
+
+<br>•Flujo de aprobaciones según nivel  
+
+<br>•Gestión de cotizaciones (RFQ) y selección de proveedor  
+
+<br>•Generación de Orden de Compra (OC)  
+
+<br>•Recepción de bienes o servicios  
+
+<br>•Validación documental (3-way match)  
+
+<br>•Ejecución de pagos (Tesorería)  
+
+<br>•Evaluación de proveedores y seguimiento de KPIs  
+
+<br>Adicionalmente, incluye un subproceso especial para compras de emergencia operativa (Nivel 3A), permitiendo la ejecución inmediata con regularización obligatoria en sistema en un plazo máximo de 24 horas. `
+    },
+    proceso: [
+        { step: `1`, title: `Detección de necesidad`, actor: `Solicitante / Sistema`, desc: `•Origen: requerimiento operativo, stock mínimo, mantenimiento programado. <br>•El sistema puede sugerir proveedores frecuentes, precios históricos y tiempos de entrega.`, consid: `-`, res: `Requerimiento identificado y listo para formalización` },
+        { step: `2`, title: `Creación de Solicitud de Compra (SC)`, actor: `Solicitante`, desc: `Captura en sistema con campos obligatorios: <br>•Tipo de compra (Operativa, Mantenimiento, Urgente/Fast-Track) <br>•Nivel de compra (1,2,3,3A,4) <br>•Centro de costo <br>•Cantidad <br>•Fecha requerida <br>•Justificación. <br>Validaciones automáticas de catálogos.`, consid: `Validación de campos obligatorios.`, res: `Solicitud de Compra registrada (Pendiente validación)` },
+        { step: `3`, title: `Validación Presupuestal`, actor: `Finanzas`, desc: `<br>•Validación de disponibilidad, partida contable y centro de costo. <br>•Control por nivel de compra. <br>Escenarios: <br>• Aprobado <br>• Rechazado <br>• Ajuste (modificación de monto).`, consid: `Asigna presupuesto si es aprobado.`, res: `SC aprobada con presupuesto asignado` },
+        { step: `4`, title: `Flujo de Aprobación`, actor: `Sistema + Aprobador`, desc: `•Flujo automático basado en monto, tipo y área. <br>•Niveles: N1 (Jefe Directo) <br>•N2 (Gerencia) <br>•N3 (Dirección) <br>•N3A (Gerente Ops rápido) <br>•N4 (Dirección+Consejo).`, consid: `Notificaciones automáticas.`, res: `SC aprobada / rechazada` },
+        { step: `5`, title: `Proceso de Cotización`, actor: `Compras`, desc: `•Envío de solicitudes (RFQ) a proveedores. <br>•Recepción y comparación automática: Precio, entrega, condiciones, score histórico.`, consid: `Regla: Mínimo 2 cotizaciones.`, res: `Cuadro comparativo de cotizaciones` },
+        { step: `6`, title: `Selección de Proveedor`, actor: `Compras`, desc: `•Análisis de propuestas y selección del óptimo (costo-beneficio). <br>•Validar al proveedor (calidad, precio, etc.).`, consid: `Regla clave: Si no se selecciona la mejor opción, justificar en sistema.`, res: `Proveedor seleccionado` },
+        { step: `7`, title: `Generación de Orden de Compra (OC)`, actor: `Sistema + Compras`, desc: `•Generación automática de OC basada en SC. <br>•Inclusión de datos, condiciones, fecha. <br>•Envío automático.`, consid: `Si es emergencia: Puede NO existir OC previa, pero debe generarse después.`, res: `OC emitida y enviada` },
+        { step: `8`, title: `Recepción de Bienes/Servicios`, actor: `Almacén / Operaciones`, desc: `•Recepción física o validación. <br>•Comparación cantidad/calidad vs OC. <br>•Registro de evidencia (fotos, firma).`, consid: `Manejo de incidencias: Rechazo parcial o total.`, res: `Recepción registrada (Aceptada/Rechazada)` },
+        { step: `9`, title: `Validación de Factura`, actor: `Sistema + Compras`, desc: `Validación automática: OC + Recepción + Factura.`, consid: `Coincide -> pasa a pago. No coincide -> bloqueo e incidencia.`, res: `Factura validada` },
+        { step: `10`, title: `Ejecución de Pago`, actor: `Tesorería`, desc: `•Programación según condiciones y flujo de caja. <br>•Ejecución, registro y notificación.`, consid: `No se paga si el proveedor no está registrado o la OC no está regularizada.`, res: `Pago realizado` }
+    ],
+    subprocesos: [
+        { title: `Proceso Fast-Track Emergencia (Nivel 3A)`, desc: `1. Operador detecta falla crítica.
+2. Autorización rápida (Llamada/WhatsApp) por Gerente Ops.
+3. Compra directa.
+4. Regularización obligatoria en sistema (SC + OC) en máximo 24 horas.
+5. Evidencia obligatoria (factura, fotos, ticket).
+6. Auditoría semanal revisa KPIs de emergencias. (NO es para saltarse el proceso, solo urgencias reales).` }
+    ],
+    reglas: [
+        `<b>General:</b> No existe OC sin SC aprobada. No hay aprobación sin validación presupuestal.`,
+        `<b>General:</b> Mínimo 2 cotizaciones. Justificación obligatoria en decisiones si no es la mejor opción.`,
+        `<b>General:</b> No se ejecuta pago sin OC válida, recepción validada y factura correcta.`,
+        `<b>General:</b> Separación de funciones estricta: Finanzas ≠ Compras ≠ Tesorería.`,
+        `<b>Creación:</b> Clasificación automática por monto y urgencia.`,
+        `<b>Presupuesto:</b> Bloqueo si excede presupuesto. Toda SC debe tener partida asignada.`,
+        `<b>Emergencia (N3A):</b> Compra inmediata permitida, pero registro obligatorio (SC+OC) en máx 24h con evidencia.`,
+        `<b>Control:</b> Si > $20,000 y urgente, requiere aprobación adicional. Si >3 urgencias en 30 días, análisis preventivo. Proveedor nuevo requiere alta express.`
+    ],
+    kpis: [
+        { cat: `Eficiencia`, nombre: `Tiempo total de compra`, formula: `Fecha pago – Fecha solicitud`, interpretacion: `Menor tiempo = mayor eficiencia` },
+        { cat: `Eficiencia`, nombre: `Tiempo de aprobación`, formula: `Fecha aprobación – Fecha solicitud`, interpretacion: `Alto = cuellos de botella` },
+        { cat: `Eficiencia`, nombre: `Tiempo generación OC`, formula: `Fecha OC – Fecha aprobación`, interpretacion: `Mide eficiencia de Compras` },
+        { cat: `Eficiencia`, nombre: `Tiempo de pago`, formula: `Fecha pago – Fecha factura validada`, interpretacion: `Impacta relación con proveedor` },
+        { cat: `Control Financiero`, nombre: `% compras dentro de presupuesto`, formula: `(Compras dentro / total) × 100`, interpretacion: `Alto = buen control financiero` },
+        { cat: `Control Financiero`, nombre: `% desviación presupuestal`, formula: `(Gasto real – pres) / pres × 100`, interpretacion: `Alto = sobrecostos` },
+        { cat: `Control Financiero`, nombre: `Ahorro en compras`, formula: `(Precio estimado – real) / estimado × 100`, interpretacion: `Alto = buena negociación` },
+        { cat: `Gestión Compras`, nombre: `% compras con excepción`, formula: `(Compras excepción / total) × 100`, interpretacion: `Alto = riesgo de malas decisiones` },
+        { cat: `Gestión Compras`, nombre: `% compras con RFQ`, formula: `(Compras con RFQ / total) × 100`, interpretacion: `Alto = mayor control` },
+        { cat: `Operación`, nombre: `% entregas a tiempo`, formula: `(Entregas a tiempo / total) × 100`, interpretacion: `Bajo = proveedor deficiente` },
+        { cat: `Operación`, nombre: `% entregas sin error`, formula: `(Entregas correctas / total) × 100`, interpretacion: `Bajo = problemas operativos` },
+        { cat: `Control`, nombre: `% compras urgentes`, formula: `(Compras urgentes / total) × 100`, interpretacion: `Alto = mala planeación` }
+    ],
+    roles: [
+        { rol: `Solicitante`, resp: `Registrar necesidades`, act: `Detectar necesidad, crear SC, indicar urgencia`, etapa: `1. Detección, 2. Creación` },
+        { rol: `Sistema / Workflow`, resp: `Automatizar y validar`, act: `Clasificar nivel, flujo aprobación, RFQ automático, OC automática, 3-way match`, etapa: `Todas (transversal)` },
+        { rol: `Finanzas`, resp: `Control presupuestal`, act: `Validar fondos, asignar partida, autorizar/rechazar, monitorear consumo`, etapa: `3. Presupuesto` },
+        { rol: `Aprobador`, resp: `Autorizar solicitudes`, act: `Revisar SC, aprobar/rechazar según nivel jerárquico`, etapa: `4. Aprobación` },
+        { rol: `Compras / Procurement`, resp: `Administrar gasto`, act: `Gestionar RFQs, seleccionar proveedor (justificar), generar OC, regularizar urgencias (≤ 24h)`, etapa: `5, 6, 7` },
+        { rol: `Proveedor`, resp: `Suministro`, act: `Enviar cotización, entregar bienes, enviar factura`, etapa: `Cotización, Entrega, Facturación` },
+        { rol: `Almacén / Operaciones`, resp: `Validar recepción`, act: `Recibir productos, validar vs OC, registrar evidencia e incidencias`, etapa: `8. Recepción` },
+        { rol: `Tesorería`, resp: `Ejecutar pagos`, act: `Programar pagos, ejecutar SPEI, validar 3-way match`, etapa: `10. Ejecución` },
+        { rol: `Auditoría / Control`, resp: `Supervisar cumplimiento`, act: `Validar trazabilidad, auditar políticas, revisar excepciones e incidencias`, etapa: `Transversal` }
+    ],
+    riesgos: [
+        { riesgo: `Compra sin necesidad real`, causa: `Falta de validación`, impacto: `Medio`, prob: `Media`, sev: `Media`, control: `Justificación obligatoria + aprobación`, tipo: `Preventivo`, etapa: `Aprobación`, resp: `Aprobador` },
+        { riesgo: `Compra sin presupuesto`, causa: `No validación`, impacto: `Alto`, prob: `Baja`, sev: `Alta`, control: `Control en tiempo real + alertas`, tipo: `Preventivo`, etapa: `SC`, resp: `Finanzas` },
+        { riesgo: `Fraude`, causa: `Mismo usuario controla todo`, impacto: `Crítico`, prob: `Baja`, sev: `Crítica`, control: `Separación: Finanzas ≠ Compras ≠ Tesorería`, tipo: `Preventivo`, etapa: `General`, resp: `Sistema` },
+        { riesgo: `Selección proveedor inadecuado`, causa: `Falta comparativa`, impacto: `Alto`, prob: `Media`, sev: `Alta`, control: `Mínimo 2 cotizaciones + Justificación`, tipo: `Preventivo`, etapa: `Cotización`, resp: `Compras` },
+        { riesgo: `Recepción incorrecta`, causa: `No validación vs OC`, impacto: `Alto`, prob: `Media`, sev: `Alta`, control: `Validación física vs OC + evidencia`, tipo: `Preventivo`, etapa: `Recepción`, resp: `Almacén` },
+        { riesgo: `Pago sin validación`, causa: `Falta control documental`, impacto: `Alto`, prob: `Baja`, sev: `Crítica`, control: `Validación 3-way match`, tipo: `Preventivo`, etapa: `Pago`, resp: `Sistema / Tesorería` },
+        { riesgo: `Exceso de compras urgentes`, causa: `Mala planeación`, impacto: `Alto`, prob: `Alta`, sev: `Media`, control: `Alertas de compras urgentes + Análisis`, tipo: `Detectivo`, etapa: `General`, resp: `Sistema` }
+    ],
+    formatos: [
+        { title: `Formato: Solicitud de Compra`, objetivo: `Formalizar la necesidad`, campos: `ID, Fecha, Solicitante, Centro costo, Tipo compra, Descripción, Cantidad, Justificación, Presupuesto estimado`, uso: `Etapa 2` },
+        { title: `Formato: Control Presupuestal`, objetivo: `Validar disponibilidad`, campos: `Área, Centro costo, Presupuesto asignado, Gasto acumulado, Disponible, Solicitado, Estatus, Justificación`, uso: `Etapa 3` },
+        { title: `Formato: Acta de Selección de Proveedor`, objetivo: `Justificar decisión`, campos: `Proveedor seleccionado, Motivo, Comparativa, ¿Mejor opción?, Justificación, Aprobación`, uso: `Etapa 6` },
+        { title: `Formato: Orden de Compra`, objetivo: `Formalizar compra`, campos: `ID OC, Proveedor, Descripción, Cantidad, Precio, Total, Condiciones, Fecha entrega`, uso: `Etapa 7` }
+    ],
+    diagrama: {
+        url: `https://www.figma.com/board/LcHyLrp5TAAwHA8NlENxst/Procesos-Bloque-1--Compras--Almacen--Mantenimiento-?node-id=431-2488`,
+        img: `img/Proceso Compras.jpg`,
+        text: `Ver diagrama completo de Compras`
+    }
+},
+    almacen: {
+    contexto: {
+        icon: `📦`,
+        title: `Gestión de Almacén`,
+        objetivo: `Asegurar la disponibilidad oportuna de refacciones e insumos mediante una gestión eficiente, controlada y trazable del inventario, garantizando el registro en tiempo real de todos los movimientos, la correcta planeación de niveles de stock y la formalización de las necesidades de abastecimiento a través de requisiciones hacia el proceso de Compras. `,
+        alcance: `El proceso abarca desde la planeación de inventarios hasta la mejora continua, incluyendo la organización del almacén, recepción de materiales, control de inventario, gestión de salidas y control operativo. Asimismo, contempla la detección de necesidades de abastecimiento, la gestión multi-base y la generación de requisiciones que activan el proceso de Compras, asegurando alineación entre el inventario físico y el sistema. `
+    },
+    proceso: [
+        { step: `1`, title: `Planeación de Inventarios`, actor: `Planeación / Operaciones`, desc: `•Integración de la demanda (Mantenimiento, Operaciones, Logística). <br>•Análisis de consumo histórico. <br>•Clasificación de productos (Críticos vs Bajo demanda). <br>•Definición de Stock Mínimo, Máximo <br>•Punto de Reorden.`, consid: `Evaluación de variables: precio, rotación, disponibilidad, espacio.`, res: `Plan de abastecimiento y niveles definidos` },
+        { step: `2`, title: `Organización del Almacén`, actor: `Almacén`, desc: `•Definir estructura física (Zonas, racks, niveles, posiciones). <br>•Asignar ubicación fija a cada SKU. <br>•Normalizar catálogo. <br>•Implementar identificación visual (etiquetas, códigos). <br>•Replicar modelo en todas las bases (central y regionales).`, consid: `-`, res: `Almacén estructurado y catálogo estandarizado` },
+        { step: `3`, title: `Recepción de Materiales`, actor: `Almacén`, desc: `•Recibir contra Orden de Compra. <br>•Validar cantidad/calidad. <br>•Si no cumple: Rechazo + devolución. <br>•Si cumple parcial: registro parcial y notificar a Compras. <br>•Registrar entrada en sistema en tiempo real antes de ubicar. <br>•Asignar ubicación física.`, consid: `Regla crítica: Sin OC válida: NO se recibe.`, res: `Inventario actualizado y entrada con folio ligado a OC` },
+        { step: `4`, title: `Control de Inventario`, actor: `Almacén / Auditoría`, desc: `•Monitoreo continuo vs niveles definidos. <br>•Reabastecimiento: Al bajar del punto de reorden se genera requisición en sistema. <br>•Insumos de planta: <br>•Ops reporta consumo <br>•Almacén genera requisición. <br>•Conteos cíclicos y consideraciones multi-base (transferencias).`, consid: `Requisición se convierte en entrada formal de Compras.`, res: `Requisiciones de compra e inventario confiable` },
+        { step: `5`, title: `Control de Salidas`, actor: `Almacén / Ops / Dirección`, desc: `•Clasificación de salidas (Con autorización, Sin autorización, Contra cambio). <br>•Validar disponibilidad. <br>•Si no hay stock: notificar y reabastecer. <br>•Registro en sistema antes de entrega. <br>•Actualizar inventario en tiempo real.`, consid: `Salida contra cambio exige devolución de material.`, res: `Inventario actualizado y salida registrada` },
+        { step: `6`, title: `Control y Orden del Almacén`, actor: `Auditoría / Supervisión`, desc: `•Validación sistema vs inventario físico. Orden y limpieza visual (5S). <br>•Auditorías programadas mínimo 1 por mes.`, consid: `-`, res: `Almacén organizado e inventario alineado` },
+        { step: `7`, title: `Evaluación y Auditoría`, actor: `Auditoría / Supervisión`, desc: `•Realizar auditorías periódicas, medir KPIs <br>•Analizar desviaciones <br>•Evaluar proveedores con incidencias.`, consid: `-`, res: `Reportes de auditoría e indicadores de desempeño` },
+        { step: `8`, title: `Retroalimentación y Mejora Continua`, actor: `Dirección / Administración`, desc: `•Revisión periódica de KPIs <br>•Sesiones de retroalimentación <br>•Definir acciones correctivas y dar seguimiento.`, consid: `-`, res: `Plan de mejora y acciones implementadas` }
+    ],
+    subprocesos: [],
+    reglas: [
+        `<b>Generales:</b> Todo producto debe tener SKU y ubicación. Movimientos deben registrarse en tiempo real. No hay movimiento sin registro. Sistema y físico deben estar alineados.`,
+        `<b>Planeación:</b> Niveles basados en consumo. Clasificación en críticos / baja demanda.`,
+        `<b>Organización:</b> Ubicaciones estandarizadas (zona, rack, nivel). Modelo replicado multi-base.`,
+        `<b>Recepción:</b> Material sin OC no se recibe. Devoluciones requieren incidencia y validación técnica.`,
+        `<b>Inventario:</b> Almacén genera requisiciones de compra, no compra directo. Ajustes prohibidos sin causa raíz.`,
+        `<b>Insumos de planta:</b> Operaciones reporta consumo, Almacén gestiona la requisición.`,
+        `<b>Salidas:</b> No hay entrega sin folio registrado. Salida contra cambio exige devolución.`,
+        `<b>Multi-base:</b> Transferencias deben registrar salida origen y entrada destino.`
+    ],
+    kpis: [
+        { cat: `Inventario`, nombre: `Exactitud de inventario (%)`, formula: `(Productos correctos / Total revisados) × 100`, interpretacion: `Confiabilidad general. Meta ≥ 98%` },
+        { cat: `Trazabilidad`, nombre: `Nivel de trazabilidad (%)`, formula: `(Movimientos registrados / Movimientos totales) × 100`, interpretacion: `Debe ser 100%` },
+        { cat: `Operación`, nombre: `% salidas registradas en tiempo real`, formula: `(Registradas antes de entrega / Total) × 100`, interpretacion: `Garantiza control. Meta 100%` },
+        { cat: `Operación`, nombre: `Nivel de cumplimiento de pedidos (%)`, formula: `(Pedidos completos a tiempo / Total) × 100`, interpretacion: `Mide nivel de servicio > 90%` },
+        { cat: `Operación`, nombre: `Tiempo de recepción`, formula: `Hora registro – Hora llegada`, interpretacion: `Ideal < 2 horas` },
+        { cat: `Calidad`, nombre: `% recepciones con incidencias`, formula: `(Recepciones con error / Total) × 100`, interpretacion: `< 5% esperado` },
+        { cat: `Control`, nombre: `Diferencias físico vs sistema`, formula: `Σ diferencias detectadas`, interpretacion: `Debe tender a 0` },
+        { cat: `Control`, nombre: `% ajustes con causa raíz`, formula: `(Ajustes con causa / Total) × 100`, interpretacion: `Debe ser 100%` },
+        { cat: `Servicio`, nombre: `Tasa de quiebre de stock`, formula: `(Solicitudes no atendidas / Total) × 100`, interpretacion: `< 5%. Si sube, falla planeación` }
+    ],
+    roles: [
+        { rol: `Almacén`, resp: `Responsable operativo`, act: `Recibir, validar, registrar E/S, conteos cíclicos, requisiciones, control multi-base`, etapa: `2, 3, 4, 5, 6` },
+        { rol: `Planeación / Operaciones`, resp: `Definir demanda`, act: `Integrar necesidades, analizar consumos, definir niveles, clasificar productos`, etapa: `1, 4, 8` },
+        { rol: `Compras`, resp: `Abastecimiento`, act: `Procesar requisiciones, generar OC, seguimiento proveedores`, etapa: `4 (Recepción de Req), 3` },
+        { rol: `Mantenimiento / Operaciones`, resp: `Usuarios`, act: `Reportar consumos, solicitar salidas, validar técnica`, etapa: `1, 3, 4, 5` },
+        { rol: `Sistemas / TI`, resp: `Soporte tecnológico`, act: `Asegurar registro, configurar multi-base, habilitar alertas`, etapa: `Transversal` },
+        { rol: `Auditoría / Supervisión`, resp: `Control`, act: `Auditorías físicas, validar físico vs sistema, revisar causas raíz`, etapa: `6, 7` },
+        { rol: `Dirección`, resp: `Estratégico`, act: `Revisar KPIs, autorizar salidas, definir acciones, toma de decisiones`, etapa: `5, 7, 8` }
+    ],
+    riesgos: [
+        { riesgo: `Planeación incorrecta`, causa: `Falta o exceso de stock`, impacto: `Alto`, prob: `Media`, sev: `Alto`, control: `Planeación basada en históricos`, tipo: `Preventivo`, etapa: `Planeación`, resp: `Planeación` },
+        { riesgo: `SKU duplicados`, causa: `Errores en inventario`, impacto: `Alto`, prob: `Media`, sev: `Alto`, control: `Catálogo centralizado`, tipo: `Preventivo`, etapa: `Organización`, resp: `Sistemas/Almacén` },
+        { riesgo: `Recepción sin OC`, causa: `Ingreso no controlado`, impacto: `Alto`, prob: `Baja`, sev: `Alto`, control: `Bloqueo de recepción sin OC`, tipo: `Preventivo`, etapa: `Recepción`, resp: `Almacén` },
+        { riesgo: `Desfase sistema vs físico`, causa: `Registro tardío`, impacto: `Alto`, prob: `Alta`, sev: `Alto`, control: `Registro en tiempo real`, tipo: `Preventivo`, etapa: `Recepción/Salidas`, resp: `Almacén` },
+        { riesgo: `Entrega sin registro`, causa: `Pérdidas y descontrol`, impacto: `Alto`, prob: `Media`, sev: `Alto`, control: `Bloqueo de salida sin registro`, tipo: `Preventivo`, etapa: `Salidas`, resp: `Almacén` },
+        { riesgo: `Falta de trazabilidad`, causa: `Procesos manuales`, impacto: `Crítico`, prob: `Alta`, sev: `Crítico`, control: `Trazabilidad 100% obligatoria`, tipo: `Preventivo`, etapa: `General`, resp: `Sistemas` }
+    ],
+    formatos: [
+        { title: `Formato de Requisición de Compra`, objetivo: `Formalizar necesidad hacia Compras`, campos: `ID, Fecha, Solicitante, Producto, Cantidad, Justificación, Inventario actual, Prioridad`, uso: `Etapa 4` },
+        { title: `Formato de Recepción de Materiales`, objetivo: `Registrar y validar ingreso`, campos: `ID, Fecha, OC, Proveedor, Producto, Cantidad recibida/esperada, Validación, Evidencia`, uso: `Etapa 3` },
+        { title: `Formato de Control de Inventario`, objetivo: `Validar exactitud físico vs sistema`, campos: `ID, Fecha, Ubicación, Producto, Cantidad sistema/física, Diferencia, Causa, Acción`, uso: `Etapa 4 y 6` }
+    ],
+    diagrama: {
+        url: `https://www.figma.com/board/LcHyLrp5TAAwHA8NlENxst/Procesos-Bloque-1--Compras--Almacen--Mantenimiento-?node-id=431-2488`,
+        img: `img/Proceso Almacen.jpg`,
+        text: `Ver diagrama completo de Almacén`
+    }
+},
+    mantenimiento: {
+    contexto: {
+        icon: `🔧`,
+        title: `Gestión de Mantenimiento`,
+        objetivo: `Gestionar de manera eficiente, controlada y trazable el mantenimiento de los activos de la operación, asegurando su disponibilidad, seguridad y correcto funcionamiento, mediante un modelo basado en revisión técnica, ejecución estructurada y mejora continua.`,
+        alcance: `El proceso de gestión de mantenimiento aplica a la administración, control y ejecución de todos los servicios técnicos asociados a los activos de la operación, incluyendo: 
+
+<br>Tipos de servicio: 
+
+<br>•Mantenimiento preventivo  
+
+<br>•Mantenimiento correctivo  
+
+<br>•Revisión / validación técnica  
+
+<br>Otros servicios técnicos (inspección, limpieza, calibración, mejora, etc.) 
+
+<br>•Tipos de ejecución: 
+
+<br>•Taller interno  
+
+<br>•Taller externo (proveedores) 
+
+<br>Activos considerados: 
+
+<br>•Unidades de transporte  
+
+<br>•Sistemas auxiliares  
+
+<br>•Equipos de planta  
+
+Instalaciones `
+    },
+    proceso: [
+        { step: `1`, title: `Detección del evento`, actor: `Operador / Sistema / Técnico`, desc: `•Operador ejecuta checklist pre-operativo (fugas, frenos, llantas). <br>•Sistema genera alertas por km, horas o vencimiento. <br>•Técnico detecta en revisiones programadas.`, consid: `Si se detecta anomalía, pasa a revisión. Si no, continua operación.`, res: `Evento identificado` },
+        { step: `2`, title: `Revisión / validación (Paso Central)`, actor: `Técnico / Encargado`, desc: `•Inspección física detallada evaluando seguridad, estado técnico y normativa. <br>•Pruebas funcionales. <br>•Consulta de historial. <br>•Diagnóstico técnico documentado en sistema y clasificación de gravedad.`, consid: `Paso obligatorio central del proceso.`, res: `Diagnóstico técnico` },
+        { step: `3`, title: `Definición de tipo de acción`, actor: `Encargado / Técnico`, desc: `Analizar diagnóstico, determinar impacto operativo y definir prioridad (alta, media, baja) y acción (Preventivo, Correctivo, Revisión, u otro servicio).`, consid: `-`, res: `Tipo de acción definido` },
+        { step: `4`, title: `Definición de tipo de taller`, actor: `Encargado / Técnico`, desc: `•Evaluar complejidad técnica, capacidad interna (herramientas, refacciones, personal), costo y tiempos. <br>•Comparar interno vs externo.`, consid: `-`, res: `Tipo de taller definido (Interno / Externo)` },
+        { step: `5`, title: `Registro del evento`, actor: `Técnico / Auxiliar`, desc: `•Captura en sistema digital: Activo, tipo de evento, tipo de acción y taller, descripción, fecha/hora, usuario, km. <br>•Adjuntar evidencia obligatoria (fotos, videos).`, consid: `Evento sin registro NO existe. Evento sin evidencia NO avanza.`, res: `Evento registrado con folio y trazable` },
+        { step: `6`, title: `Programación`, actor: `Encargado / Coordinador Ops`, desc: `Validar disponibilidad del activo, coordinar con operación (rutas), asignar fecha y responsable. Validar si preventivo está en ventana, o si correctivo es crítico.`, consid: `-`, res: `Orden programada` },
+        { step: `7`, title: `Ejecución de mantenimiento`, actor: `Técnico / Proveedor / Encargado`, desc: `•Revisar orden y confirmar recursos. <br>•Registrar inicio. <br>•Preventivo: checklist, limpieza, ajuste, sustitución. <br>•Correctivo: desmontar, reparar, pruebas. <br>•Taller Externo: documentar salida/entrada, facturas y validar vs cotización.`, consid: `Nuevas fallas detectadas requieren nuevo evento. Proveedor externo exige cotización y autorización.`, res: `Servicio ejecutado y documentado` },
+        { step: `8`, title: `Validación final`, actor: `Encargado de mantenimiento`, desc: `•Validar cumplimiento técnico, seguridad y funcionamiento. <br>•Revisar evidencia y realizar pruebas operativas.`, consid: `Regla crítica: No se puede cerrar sin validación final. Si falla, regresa a ejecución.`, res: `Validación aprobada` },
+        { step: `9`, title: `Cierre`, actor: `Auxiliar / Encargado`, desc: `•Registrar tipo de servicio, costos, proveedor. <br>•Actualizar estatus del activo (Disponible/Con Restricción). <br>•Cerrar evento en el sistema.`, consid: `-`, res: `Evento cerrado` },
+        { step: `10`, title: `Reporte y mejora continua`, actor: `Encargado / Dirección`, desc: `•Analizar desempeño (KPIs), identificar fallas recurrentes, evaluar proveedores, ajustar plan preventivo. <br>•Generar acciones correctivas.`, consid: `-`, res: `Mejora continua` }
+    ],
+    subprocesos: [],
+    reglas: [
+        `•Todo evento debe registrarse con evidencia en el sistema antes de ser atendido; sin registro no existe.`,
+        `•Obligatoria la revisión/validación técnica antes de definir la acción.`,
+        `<b>Seguridad:</b> Si el activo representa riesgo, pasa automáticamente a 'Fuera de servicio'.`,
+        `•No se permite cerrar un evento sin validación técnica final y evidencia completa.`,
+        `<b>Preventivo:</b> Debe ejecutarse dentro de sus ventanas de tolerancia.`,
+        `</b>Taller Externo:</b> Requiere cotización previa, autorización y control documental completo a la entrada y salida.`,
+        `•Durante la ejecución, nuevas fallas se registran como eventos independientes.`,
+        `•Checklist pre-operativo es obligatorio antes de operar el activo.`
+    ],
+    kpis: [
+        { cat: `Disponibilidad`, nombre: `Disponibilidad de activos (%)`, formula: `(Activos disponibles / Total activos) × 100`, interpretacion: `Qué tan lista está la operación para trabajar` },
+        { cat: `Preventivo`, nombre: `% preventivo vs correctivo`, formula: `(Preventivos / Total eventos) × 100`, interpretacion: `Nivel de madurez del mantenimiento` },
+        { cat: `Preventivo`, nombre: `Cumplimiento de preventivos (%)`, formula: `(Preventivos realizados / programados) × 100`, interpretacion: `Disciplina del proceso preventivo` },
+        { cat: `Preventivo`, nombre: `Cumplimiento de ventanas (%)`, formula: `(Preventivos en ventana / total) × 100`, interpretacion: `Oportunidad del mantenimiento` },
+        { cat: `Eficiencia`, nombre: `Tiempo de respuesta`, formula: `Hora inicio atención - hora registro`, interpretacion: `Rapidez ante fallas` },
+        { cat: `Eficiencia`, nombre: `Tiempo de ejecución`, formula: `Hora cierre - hora inicio`, interpretacion: `Eficiencia del mantenimiento` },
+        { cat: `Correctivo`, nombre: `Fallas en operación`, formula: `Número de fallas en operación`, interpretacion: `Nivel de confiabilidad` },
+        { cat: `Revisión`, nombre: `% revisiones conformes`, formula: `(Revisiones OK / total revisiones) × 100`, interpretacion: `Condición real de activos` },
+        { cat: `Costos`, nombre: `Costo por activo`, formula: `Costo total / número de activos`, interpretacion: `Eficiencia del gasto` },
+        { cat: `Proveedores`, nombre: `Desempeño de proveedores (%)`, formula: `(Servicios a tiempo / total servicios externos) × 100`, interpretacion: `Cumplimiento de talleres externos` }
+    ],
+    roles: [
+        { rol: `Operador / Chofer`, resp: `Condiciones básicas`, act: `Ejecutar checklist pre-operativo, detectar fugas, reportar, detener operación si aplica`, etapa: `1` },
+        { rol: `Técnico de mantenimiento`, resp: `Ejecución técnica`, act: `Revisión técnica, diagnóstico, ejecución preventivo/correctivo, registro`, etapa: `1, 2, 3, 4, 5, 7` },
+        { rol: `Encargado mantenimiento`, resp: `Dueño del proceso`, act: `Validar diagnóstico, priorizar, programar, supervisar, validación final`, etapa: `2, 3, 4, 6, 7, 8, 9, 10` },
+        { rol: `Auxiliar administrativo`, resp: `Control documental`, act: `Asegurar registro, cerrar evento, costear`, etapa: `5, 9` },
+        { rol: `Coordinador operaciones`, resp: `Disponibilidad operativa`, act: `Agendar servicios, coordinar activo`, etapa: `6` },
+        { rol: `Finanzas / Tesorería`, resp: `Impacto financiero`, act: `Autorizar cotizaciones, pagos a externos`, etapa: `Transversal` },
+        { rol: `Dirección / Gerencia`, resp: `Supervisar`, act: `Definir líneas estratégicas, KPIs`, etapa: `10` }
+    ],
+    riesgos: [
+        { riesgo: `Operación de unidad insegura`, causa: `Omisión de inspección`, impacto: `Crítico`, prob: `Media`, sev: `Crítica`, control: `Bloqueo automático si excede tolerancias / Fuera de servicio`, tipo: `Preventivo`, etapa: `Detección`, resp: `Sistema/Encargado` },
+        { riesgo: `No ejecución de preventivo`, causa: `Mala programación`, impacto: `Alto`, prob: `Media`, sev: `Alta`, control: `Alertas y bloqueo por Km/horas`, tipo: `Preventivo`, etapa: `Programación`, resp: `Sistema/Ops` },
+        { riesgo: `Cierre sin validación técnica`, causa: `Falta de supervisión`, impacto: `Alto`, prob: `Media`, sev: `Alta`, control: `Pruebas operativas obligatorias antes de cierre`, tipo: `Preventivo`, etapa: `Validación final`, resp: `Encargado` },
+        { riesgo: `Exceso de correctivos`, causa: `Mal diagnóstico`, impacto: `Alto`, prob: `Media`, sev: `Media`, control: `Paso central de Revisión Técnica detallada`, tipo: `Preventivo`, etapa: `Revisión`, resp: `Encargado` }
+    ],
+    formatos: [], // No tiene `Formatos sugeridos`
+    diagrama: {
+        url: `https://www.figma.com/board/LcHyLrp5TAAwHA8NlENxst/Procesos-Bloque-1--Compras--Almacen--Mantenimiento-?node-id=431-3064`,
+        img: `img/Proceso Mantenimiento.jpg`,
+        text: `Ver diagrama completo de Mantenimiento`
+    }
+}
 };
 
 // ==========================================
@@ -428,8 +480,8 @@ document.addEventListener("DOMContentLoaded", () => {
                         <h2 class="content-subtitle">Reglas de Negocio</h2>
                         <p class="content-text">Políticas estrictas y controles que el sistema y los usuarios deben respetar durante el flujo operativo.</p>
                         
-                        <div class="alert-box" style="border-left-color: #E03131; background-color: #FFF5F5;">
-                            <div class="alert-title" style="color: #E03131;">
+                        <div class="alert-box" style="border-left-color: var(--secondary-color); background-color: #EFF6FF;">
+                            <div class="alert-title" style="color: var(--secondary-color);">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                                 Lineamientos Obligatorios
                             </div>
@@ -573,6 +625,38 @@ document.addEventListener("DOMContentLoaded", () => {
                 `;
                 break;
                 
+            
+            case "formatos":
+                if (!processData.formatos || processData.formatos.length === 0) {
+                    htmlContent = `
+                        <div class="content-card">
+                            ${headerHtml}
+                            <h2 class="content-subtitle">Formatos Sugeridos</h2>
+                            <p class="content-text">No hay formatos sugeridos documentados para este proceso.</p>
+                        </div>`;
+                    break;
+                }
+                const formatosHtml = processData.formatos.map(f => `
+                    <div class="alert-box" style="border-left-color: var(--primary-color); background-color: #F8FAFC; margin-bottom: 1rem;">
+                        <div class="alert-title" style="color: var(--primary-color);">${f.title}</div>
+                        <p style="margin: 8px 0; font-size: 0.9rem;"><strong>Objetivo:</strong> ${f.objetivo}</p>
+                        <p style="margin: 8px 0; font-size: 0.9rem;"><strong>Campos clave:</strong> ${f.campos}</p>
+                        <p style="margin: 8px 0; font-size: 0.9rem;"><strong>Uso en el proceso:</strong> ${f.uso}</p>
+                    </div>
+                `).join("");
+                
+                htmlContent = `
+                    <div class="content-card">
+                        ${headerHtml}
+                        <h2 class="content-subtitle">Formatos Sugeridos</h2>
+                        <p class="content-text">Documentos y formatos recomendados para la operación de este proceso.</p>
+                        <div style="margin-top: 1.5rem;">
+                            ${formatosHtml}
+                        </div>
+                    </div>
+                `;
+                break;
+
             case "diagrama":
                 let btnHtml = "";
                 if (processData.diagrama.url && processData.diagrama.url !== "#") {

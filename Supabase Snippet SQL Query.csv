@@ -1,0 +1,101 @@
+table_name,column_name,data_type
+admin_agents,id,bigint
+admin_agents,full_name,text
+admin_agents,email,text
+admin_agents,password,text
+admin_agents,phone,text
+admin_agents,created_at,timestamp with time zone
+ai_conversations,id,bigint
+ai_conversations,project_id,bigint
+ai_conversations,user_id,bigint
+ai_conversations,context_type,text
+ai_conversations,messages,jsonb
+ai_conversations,created_at,timestamp with time zone
+canon_oferta_mensual_send,id,bigint
+canon_oferta_mensual_send,created_at,timestamp with time zone
+canon_oferta_mensual_send,chat_id,character varying
+canon_oferta_mensual_send,date,date
+cantera_connect_solicitud_vacaciones,id,bigint
+cantera_connect_solicitud_vacaciones,created_at,timestamp with time zone
+cantera_connect_solicitud_vacaciones,fecha,text
+cantera_connect_solicitud_vacaciones,nombre,text
+cantera_connect_solicitud_vacaciones,correo,text
+cantera_connect_solicitud_vacaciones,cantidad_dias,bigint
+cantera_connect_solicitud_vacaciones,fechas,text
+cantera_connect_solicitud_vacaciones,departamento,text
+cantera_connect_solicitud_vacaciones,estado,text
+cantera_connect_solicitud_vacaciones,aprobacion_rh,boolean
+cantera_connect_solicitud_vacaciones,aprobacion_lider,boolean
+cantera_connect_solicitud_vacaciones,aprobacion_pm,boolean
+cantera_connect_solicitud_vacaciones,motivo_rechazo_rh,text
+cantera_connect_solicitud_vacaciones,motivo_rechazo_lider,text
+clientes_projectos,id,bigint
+clientes_projectos,id_cliente,bigint
+clientes_projectos,id_proyecto,bigint
+clientes_projectos,created_at,timestamp with time zone
+clientes_usuario,id,bigint
+clientes_usuario,full_name,text
+clientes_usuario,session_name,text
+clientes_usuario,email,text
+clientes_usuario,whatsapp_number,text
+clientes_usuario,password,text
+clientes_usuario,created_at,timestamp with time zone
+clientes_usuario,project_id,bigint
+clientes_usuario,status,text
+clientes_usuario,last_access_time,timestamp without time zone
+clientes_usuario,stripe_customner_id,text
+clientes_usuario,fcm_token,text
+clientes_usuario,theme,text
+colaboradores,id,bigint
+colaboradores,nombre,text
+colaboradores,departamento_id,bigint
+colaboradores,correo,text
+colaboradores,fecha_ingreso,date
+colaboradores,dias_vacaciones_restantes,integer
+colaboradores,fecha_nacimiento,date
+colaboradores,telefono,text
+colaboradores,token_firebase,text
+colaboradores,created_at,timestamp with time zone
+colaboradores,tipo_contrato,text
+colaboradores,puesto,text
+colaboradores,ubicacion,text
+colaboradores,direccion,text
+colaboradores,cp,text
+colaboradores,numero_seguro_social,text
+colaboradores,rfc,text
+colaboradores,curp,text
+colaboradores,estado_civil,text
+contacts,id,bigint
+contacts,created_at,timestamp with time zone
+contacts,numero_id,text
+contacts,estatus,text
+contacts,project_id,bigint
+contacts,name_whatsapp,text
+contacts,real_name,text
+contacts,type_conversation,text
+contacts,alerta_humano,boolean
+contacts,sentiment,text
+contacts,last_product_id,bigint
+contacts,encuesta,boolean
+contacts,error_encuesta,text
+contacts,estatus_encuesta,text
+conversation,id,bigint
+conversation,created_at,timestamp with time zone
+conversation,chat_id,text
+conversation,type,text
+conversation,message,text
+conversation,contact_id,bigint
+conversation,project_id,bigint
+conversation,product_id,bigint
+cv_provicional,id,bigint
+cv_provicional,created_at,timestamp with time zone
+cv_provicional,chat_id,text
+cv_provicional,cv,text
+cv_provicional,project_id,bigint
+dashboard_datos_entrevista_rh_sin_cv,id,bigint
+dashboard_datos_entrevista_rh_sin_cv,created_at,timestamp with time zone
+dashboard_datos_entrevista_rh_sin_cv,empresa,text
+dashboard_datos_entrevista_rh_sin_cv,ubicacion,text
+dashboard_datos_entrevista_rh_sin_cv,mapa,text
+dashboard_datos_entrevista_rh_sin_cv,horario,text
+dashboard_datos_entrevista_rh_sin_cv,documentacion,text
